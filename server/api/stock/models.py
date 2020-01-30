@@ -24,4 +24,4 @@ class Product(models.Model):
     amount = models.IntegerField(
         verbose_name=_("Quantidade"),
         max_length=100
-    )
+    )    
