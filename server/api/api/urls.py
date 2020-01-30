@@ -19,6 +19,11 @@ from stock import views as stock
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('products/', stock.ListView.as_view()),
-    path('products/<int:pk>/', stock.DetailView.as_view())
+    path('products/', stock.ProductList.as_view()),
+    path('products/<int:pk>/', stock.ProductDetail.as_view()),
+    path('categories/', stock.CategoryList.as_view()),
+    path('categories/<int:pk>/', stock.CategoryDetail.as_view()),
+    path('requests/', stock.RequestList.as_view()),
+    path('requests/<int:pk>/', stock.RequestDetail.as_view()),
+
 ]

@@ -1,6 +1,7 @@
 from . import models
 from rest_framework import serializers, validators
 from django.utils.translation import gettext as _
+from django.contrib.auth.admin import User
 
 class ProductListSerializer(serializers.ModelSerializer):
     
@@ -18,6 +19,7 @@ class ProductListSerializer(serializers.ModelSerializer):
         fields = [
             'name',
             'description',
+            'brand',
             'bar_code',
             'category',
             'registration',
@@ -43,6 +45,26 @@ class CategoryListSerializer(serializers.ModelSerializer):
             'reference',
             'amount',
             'minimum',
-            'ideal',
             'registration',
+            'products'
+        ]
+
+class RequestSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(
+        read_only=True,
+    )
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        data = {**validated_data, 'user': user}
+        return super(RequestSerializer, self).create(data)
+    
+    class Meta:
+        model = models.Request
+        fields = [
+            'product',
+            'registration',
+            'amount',
+            'delivered',
+            'user',
         ]

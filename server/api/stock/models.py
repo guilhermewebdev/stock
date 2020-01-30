@@ -1,7 +1,9 @@
 from django.db import models
 from django.utils.translation import gettext as _ 
+from django.contrib.auth.admin import User
 
 class Category(models.Model):
+    objects = models.Manager()
     name = models.CharField(
         verbose_name=_("Nome"),
         max_length=200,
@@ -16,9 +18,6 @@ class Category(models.Model):
     )
     minimum = models.IntegerField(
         verbose_name=_("Quantidade mínima")
-    )
-    ideal = models.IntegerField(
-        verbose_name=_("Quantidade ideal")
     )
     registration = models.DateTimeField(
         verbose_name=_("Data do cadasto"),
@@ -42,7 +41,11 @@ class Product(models.Model):
         max_length=500,
         null=True,
         blank=True,
-    )    
+    )
+    brand = models.CharField(
+        verbose_name=_('Marca'),
+        max_length=200,
+    )
     category = models.ForeignKey(
         Category,
         on_delete=models.CASCADE,
@@ -54,5 +57,27 @@ class Product(models.Model):
     )
     amount = models.IntegerField(
         verbose_name=_("Quantidade"),
+    )    
+
+class Request(models.Model):
+    objects = models.Manager()
+    product = models.ForeignKey(
+        Category,
+        on_delete=models.DO_NOTHING
     )
-    
+    user = models.ForeignKey(
+        User,
+        on_delete=models.DO_NOTHING
+    )
+    registration = models.DateTimeField(
+        verbose_name=_('Data da requisição'),
+        auto_now=True,
+    )
+    amount = models.IntegerField(
+        verbose_name=_('Quantidade')
+    )
+    delivered = models.DateTimeField(
+        verbose_name=_('Data da entrega'),
+        null=True,
+        blank=True,
+    )
