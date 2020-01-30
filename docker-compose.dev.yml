@@ -5,8 +5,21 @@ services:
         build: 
             context: ./server/api/
             dockerfile: Dockerfile.dev
+        restart: always
         volumes:
             - ./server/api:/code
         command: ./manage.py runserver 0.0.0.0:5804
+        environment: 
+            DB_NAME: clinica
+            DB_USER: centroavancado
+            DB_PASSWORD: abda143501.com
         ports: 
-            - 5804:5804    
+            - 5804:5804   
+            
+    db:
+        image: postgres
+        restart: always
+        environment: 
+            POSTGRES_DB: clinica
+            POSTGRES_USER: centroavancado
+            POSTGRES_PASSWORD: abda143501.com
