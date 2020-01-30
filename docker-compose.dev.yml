@@ -1,0 +1,12 @@
+version: "3.7"
+
+services: 
+    api:
+        build: 
+            context: ./server/api/
+            dockerfile: Dockerfile.dev
+        volumes:
+            - ./server/api:/code
+        command: ./manage.py runserver 0.0.0.0:5804
+        ports: 
+            - 5804:5804    
