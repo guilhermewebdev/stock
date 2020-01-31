@@ -13,9 +13,6 @@ class Category(models.Model):
         max_length=30,
         unique=True,
     )
-    amount = models.IntegerField(
-        verbose_name=_("Quantidade"),
-    )
     minimum = models.IntegerField(
         verbose_name=_("Quantidade mínima")
     )
@@ -24,19 +21,12 @@ class Category(models.Model):
         auto_now=True,
     )
     
-    def get_default_amount(self):
+    def get_amount(self):
         products = list(self.products.all())
         amount = 0
         for product in products:
             amount += product.amount
         return amount
-
-    def set_amount(self, value):
-        self.amount = value
-
-    def save(self, *args, **kwargs):
-        self.set_amount(self.get_default_amount())
-        return super(Category, self).save(*args, **kwargs)
 
 class Product(models.Model):
     objects = models.Manager()
@@ -176,11 +166,26 @@ class Delivery(models.Model):
         related_name='deliveries'
     )
     registration = models.DateTimeField(
-        verbose_name=_('Data da requisição'),
+        verbose_name=_('Data da entrega'),
         auto_now=True,
+    )
+    amount = models.IntegerField(
+        verbose_name=_('Retiradas')
     )
     user = models.ForeignKey(
         User,
         on_delete=models.DO_NOTHING,
         related_name='deliveries',        
     )
+
+    def remove(self):
+        removal = Removal(
+            product=self.product,
+            amount=self.amount,
+            user=self.user,       
+        )
+        removal.save()
+
+    def save(self, *args, **kwargs):
+        self.remove()
+        return super(Delivery, self).save(*args, **kwargs)

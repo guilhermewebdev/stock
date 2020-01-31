@@ -31,3 +31,5 @@ server/api/stock/migrations/__pycache__/0018_request_note.cpython-38.pyc
 server/api/stock/migrations/__pycache__/0019_auto_20200131_1529.cpython-38.pyc
 server/api/stock/migrations/__pycache__/0020_auto_20200131_1551.cpython-38.pyc
 server/api/stock/migrations/__pycache__/0021_auto_20200131_1558.cpython-38.pyc
+server/api/stock/migrations/__pycache__/0023_auto_20200131_1610.cpython-38.pyc
+server/api/stock/migrations/__pycache__/0022_delivery_amount.cpython-38.pyc
