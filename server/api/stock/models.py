@@ -72,13 +72,37 @@ class Product(models.Model):
         verbose_name=_("Quantidade"),
     )
 
+class Removal(models.Model):
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='removals',        
+    )
+    amount = models.IntegerField(
+        verbose_name=_('Retiradas')
+    )
+    registration = models.DateTimeField(
+        verbose_name=_("Data do cadasto"),
+        auto_now=True,
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.DO_NOTHING,
+        related_name='removals',        
+    )
+
+    def save(self, *args, **kwargs):
+        self.product.amount -= self.amount
+        self.product.save()
+        return super(Removal, self).save(*args, **kwargs)
+
 class Consumer(models.Model):
     TYPES = (
-        ('USER', _('Usuário')),
-        ('DENTIST', _('Dentista')),
-        ('CHAMBER', _('Consultório')),
-        ('OTHER', _('Outro')),
-        ('PATIENT', _('Paciente')),
+        ('user', _('Usuário')),
+        ('dentist', _('Dentista')),
+        ('chamber', _('Consultório')),
+        ('patient', _('Paciente')),
+        ('other', _('Outro')),
     )
     type = models.CharField(
         verbose_name=_('Tipo de consumidor'),
@@ -106,6 +130,10 @@ class Consumer(models.Model):
         verbose_name=_('Outro'),
         max_length=100,
     )
+    registration = models.DateTimeField(
+        verbose_name=_("Data do cadasto"),
+        auto_now=True,
+    )
 
 class Request(models.Model):
     objects = models.Manager()
@@ -117,6 +145,7 @@ class Request(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.DO_NOTHING,
+        related_name='requests',
     )
     consumer = models.ForeignKey(
         Consumer,
@@ -130,8 +159,28 @@ class Request(models.Model):
     amount = models.IntegerField(
         verbose_name=_('Quantidade')
     )
-    delivered = models.DateTimeField(
-        verbose_name=_('Data da entrega'),
-        null=True,
-        blank=True,
+    note = models.CharField(
+        verbose_name=_('Observação'),
+        max_length=300,
+    )
+
+class Delivery(models.Model):
+    request = models.OneToOneField(
+        Request,
+        on_delete=models.CASCADE,
+        related_name='delivery'
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.DO_NOTHING,
+        related_name='deliveries'
+    )
+    registration = models.DateTimeField(
+        verbose_name=_('Data da requisição'),
+        auto_now=True,
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.DO_NOTHING,
+        related_name='deliveries',        
     )

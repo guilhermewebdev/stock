@@ -60,6 +60,7 @@ class ConsumerSerializer(serializers.ModelSerializer):
             'user',
             'dentist',
             'chamber',
+            'patient',
             'other',
         ]
 
@@ -87,6 +88,7 @@ class RequestSerializer(serializers.ModelSerializer):
             'product',
             'registration',
             'amount',
+            'note',
             'delivered',
             'user',
             'consumer',

@@ -25,3 +25,9 @@ server/api/stock/migrations/__pycache__/0012_request_consumer.cpython-38.pyc
 server/api/stock/migrations/__pycache__/0013_auto_20200131_1509.cpython-38.pyc
 server/api/stock/migrations/__pycache__/0014_auto_20200131_1515.cpython-38.pyc
 server/api/stock/migrations/__pycache__/0015_auto_20200131_1520.cpython-38.pyc
+server/api/stock/migrations/__pycache__/0016_auto_20200131_1522.cpython-38.pyc
+server/api/stock/migrations/__pycache__/0017_auto_20200131_1523.cpython-38.pyc
+server/api/stock/migrations/__pycache__/0018_request_note.cpython-38.pyc
+server/api/stock/migrations/__pycache__/0019_auto_20200131_1529.cpython-38.pyc
+server/api/stock/migrations/__pycache__/0020_auto_20200131_1551.cpython-38.pyc
+server/api/stock/migrations/__pycache__/0021_auto_20200131_1558.cpython-38.pyc
