@@ -43,9 +43,9 @@ class CategoryDetail(DetailView):
     serializer_class = serializers.CategoryListSerializer
 
 class RequestList(ListView):
-    queryset = models.Request.objects.all()
+    queryset = models.ConsumptionRequest.objects.all()
     serializer_class = serializers.RequestSerializer
 
 class RequestDetail(DetailView):
-    queryset = models.Request.objects.all()
+    queryset = models.ConsumptionRequest.objects.all()
     serializer_class = serializers.RequestSerializer

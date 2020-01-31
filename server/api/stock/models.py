@@ -217,7 +217,7 @@ class Consumer(models.Model):
         auto_now=True,
     )
 
-class Request(models.Model):
+class ConsumptionRequest(models.Model):
     objects = models.Manager()
     product = models.ForeignKey(
         Category,
@@ -251,7 +251,7 @@ class Request(models.Model):
 
 class Delivery(models.Model):
     request = models.OneToOneField(
-        Request,
+        ConsumptionRequest,
         on_delete=models.DO_NOTHING,
         related_name='delivery'
     )

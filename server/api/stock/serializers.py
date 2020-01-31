@@ -83,7 +83,7 @@ class RequestSerializer(serializers.ModelSerializer):
         return super(RequestSerializer, self).create(data)
     
     class Meta:
-        model = models.Request
+        model = models.ConsumptionRequest
         fields = [
             'product',
             'registration',
