@@ -89,7 +89,6 @@ class RequestSerializer(serializers.ModelSerializer):
             'registration',
             'amount',
             'note',
-            'delivered',
             'user',
             'consumer',
         ]

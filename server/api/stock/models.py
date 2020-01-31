@@ -1,6 +1,13 @@
 from django.db import models
 from django.utils.translation import gettext as _ 
 from django.contrib.auth.admin import User
+from django.core.exceptions import ValidationError
+
+def validator_amount(value):
+    if value < 0:
+        raise ValidationError(
+            _('Não é possível existir um valor negativo')
+        ) 
 
 class Category(models.Model):
     objects = models.Manager()
@@ -60,7 +67,81 @@ class Product(models.Model):
     )
     amount = models.IntegerField(
         verbose_name=_("Quantidade"),
+        validators=[
+            validator_amount
+        ]
     )
+
+##################################################################
+#############               Additions            #################
+##################################################################
+
+class Addition(models.Model):
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.DO_NOTHING,
+        related_name='additions'
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.DO_NOTHING,
+        related_name='additions'
+    )
+    registration = models.DateTimeField(
+        verbose_name=_("Data do cadasto"),
+        auto_now=True,
+    )
+    amount = models.IntegerField(
+        verbose_name=_("Quantidade"),
+        validators=[validator_amount]
+    )
+
+    def save(self, *args, **kwargs):
+        self.product.amount += self.amount
+        self.product.save(update_fields=['amount'])
+        return super(Addition, self).save(*args, **kwargs)
+
+class Purchase(models.Model):
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.DO_NOTHING,
+        related_name='purchases'
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.DO_NOTHING,
+        related_name='purchases'
+    )
+    registration = models.DateTimeField(
+        verbose_name=_("Data do compra"),
+        auto_now=True,
+    )
+    amount = models.IntegerField(
+        verbose_name=_("Quantidade"),
+        validators=[
+            validator_amount
+        ]
+    )
+    value = models.FloatField(
+        verbose_name=_('Valor'),
+    )
+
+    def add(self):
+        addittion = Addition(
+            product=self.product,
+            user=self.user,
+            amount=self.amount,
+        )
+        return addittion.save()
+
+    def save(self, *args, **kwargs):
+        self.add()
+        return super(Purchase, self).save(*args, **kwargs)
+
+
+##################################################################
+#############               Removals            ##################
+##################################################################   
 
 class Removal(models.Model):
     product = models.ForeignKey(
@@ -69,7 +150,10 @@ class Removal(models.Model):
         related_name='removals',        
     )
     amount = models.IntegerField(
-        verbose_name=_('Retiradas')
+        verbose_name=_('Retiradas'),
+        validators=[
+            validator_amount
+        ]
     )
     registration = models.DateTimeField(
         verbose_name=_("Data do cadasto"),
@@ -82,8 +166,16 @@ class Removal(models.Model):
     )
 
     def save(self, *args, **kwargs):
+        if self.amount > self.product.amount:
+            raise ValidationError(
+                _('Há apenas %(products)s no estoque, mas a requisição exige %(value)s'),
+                params={
+                    'products': self.product.amount,
+                    'value': self.amount,
+                }
+            )
         self.product.amount -= self.amount
-        self.product.save()
+        self.product.save(update_fields=['amount'])
         return super(Removal, self).save(*args, **kwargs)
 
 class Consumer(models.Model):
@@ -101,7 +193,7 @@ class Consumer(models.Model):
     )
     user = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
         related_name='consumption'
     )
     dentist = models.CharField(
@@ -147,7 +239,10 @@ class Request(models.Model):
         auto_now=True,
     )
     amount = models.IntegerField(
-        verbose_name=_('Quantidade')
+        verbose_name=_('Quantidade'),
+        validators=[
+            validator_amount
+        ]
     )
     note = models.CharField(
         verbose_name=_('Observação'),
@@ -157,7 +252,7 @@ class Request(models.Model):
 class Delivery(models.Model):
     request = models.OneToOneField(
         Request,
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
         related_name='delivery'
     )
     product = models.ForeignKey(
@@ -170,7 +265,10 @@ class Delivery(models.Model):
         auto_now=True,
     )
     amount = models.IntegerField(
-        verbose_name=_('Retiradas')
+        verbose_name=_('Retiradas'),
+        validators=[
+            validator_amount
+        ]
     )
     user = models.ForeignKey(
         User,
