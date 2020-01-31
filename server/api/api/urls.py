@@ -25,5 +25,4 @@ urlpatterns = [
     path('categories/<int:pk>/', stock.CategoryDetail.as_view()),
     path('requests/', stock.RequestList.as_view()),
     path('requests/<int:pk>/', stock.RequestDetail.as_view()),
-
 ]

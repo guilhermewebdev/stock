@@ -3,8 +3,7 @@ from rest_framework import serializers, validators
 from django.utils.translation import gettext as _
 from django.contrib.auth.admin import User
 
-class ProductListSerializer(serializers.ModelSerializer):
-    
+class ProductListSerializer(serializers.ModelSerializer):    
     registration = serializers.DateTimeField(
         read_only=True,
         label=_("Data de registro")
@@ -37,6 +36,9 @@ class CategoryListSerializer(serializers.ModelSerializer):
         ],
         label=_("Referência")
     )
+    amount = serializers.IntegerField(
+        read_only=True,
+    )
 
     class Meta:
         model = models.Category
@@ -49,9 +51,29 @@ class CategoryListSerializer(serializers.ModelSerializer):
             'products'
         ]
 
+class ConsumerSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Consumer
+        fields = [
+            'type',
+            'user',
+            'dentist',
+            'chamber',
+            'other',
+        ]
+
 class RequestSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
         read_only=True,
+    )
+    consumer = ConsumerSerializer(
+        label=_('Consumidor'),
+        required=True,
+    )
+    amount = serializers.IntegerField(
+        required=True,
+        label=_('Quantidade')
     )
 
     def create(self, validated_data):
@@ -67,4 +89,5 @@ class RequestSerializer(serializers.ModelSerializer):
             'amount',
             'delivered',
             'user',
+            'consumer',
         ]

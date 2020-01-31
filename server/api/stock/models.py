@@ -24,6 +24,19 @@ class Category(models.Model):
         auto_now=True,
     )
     
+    def get_default_amount(self):
+        products = list(self.products.all())
+        amount = 0
+        for product in products:
+            amount += product.amount
+        return amount
+
+    def set_amount(self, value):
+        self.amount = value
+
+    def save(self, *args, **kwargs):
+        self.set_amount(self.get_default_amount())
+        return super(Category, self).save(*args, **kwargs)
 
 class Product(models.Model):
     objects = models.Manager()
@@ -57,17 +70,58 @@ class Product(models.Model):
     )
     amount = models.IntegerField(
         verbose_name=_("Quantidade"),
-    )    
+    )
+
+class Consumer(models.Model):
+    TYPES = (
+        ('USER', _('Usuário')),
+        ('DENTIST', _('Dentista')),
+        ('CHAMBER', _('Consultório')),
+        ('OTHER', _('Outro')),
+        ('PATIENT', _('Paciente')),
+    )
+    type = models.CharField(
+        verbose_name=_('Tipo de consumidor'),
+        max_length=100,
+        choices=TYPES
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='consumption'
+    )
+    dentist = models.CharField(
+        verbose_name=_('Dentista'),
+        max_length=100,
+    )
+    chamber = models.CharField(
+        verbose_name=_('Consultório'),
+        max_length=100,
+    )
+    patient = models.CharField(
+        verbose_name=_('Paciente'),
+        max_length=100,
+    )
+    other = models.CharField(
+        verbose_name=_('Outro'),
+        max_length=100,
+    )
 
 class Request(models.Model):
     objects = models.Manager()
     product = models.ForeignKey(
         Category,
-        on_delete=models.DO_NOTHING
+        on_delete=models.DO_NOTHING,
+        related_name='requests'
     )
     user = models.ForeignKey(
         User,
-        on_delete=models.DO_NOTHING
+        on_delete=models.DO_NOTHING,
+    )
+    consumer = models.ForeignKey(
+        Consumer,
+        on_delete=models.DO_NOTHING,
+        related_name='requests'
     )
     registration = models.DateTimeField(
         verbose_name=_('Data da requisição'),
