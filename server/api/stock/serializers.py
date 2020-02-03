@@ -16,6 +16,7 @@ class ProductListSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Product
         fields = [
+            'pk',
             'name',
             'description',
             'brand',
@@ -24,25 +25,29 @@ class ProductListSerializer(serializers.ModelSerializer):
             'registration',
             'amount',
         ]
+        read_only_fields = [
+            'pk'
+        ]
 
 class CategoryListSerializer(serializers.ModelSerializer):
-    products = ProductListSerializer(many=True)
+    products = ProductListSerializer(
+        many=True,
+        required=False,
+    )
     reference = serializers.CharField(
         validators=[
             validators.UniqueValidator(
-                queryset=models.Product.objects.all(),
+                queryset=models.Category.objects.all(),
                 message=_("A referência já está sendo utilizada")
             )
         ],
         label=_("Referência")
-    )
-    amount = serializers.IntegerField(
-        read_only=True,
-    )
+    )    
 
     class Meta:
         model = models.Category
         fields = [
+            'pk',
             'name',
             'reference',
             'amount',
@@ -50,18 +55,80 @@ class CategoryListSerializer(serializers.ModelSerializer):
             'registration',
             'products'
         ]
+        read_only_fields = [
+            'pk',
+            'amount',
+            'registration',            
+        ]
+
+##################################################################
+#############               Additions            #################
+##################################################################
+
+class AdditionSerializer(serializers.ModelSerializer):
+    registration = serializers.DateTimeField(
+        read_only=True,
+    )
+
+    def create(self, validated_data):
+        addition = self.context['request'].user.additions.all().create(**validated_data)
+        addition.save()
+        return addition
+
+    class Meta:
+        model = models.Addition
+        fields = [
+            'pk',
+            'product',
+            'user',
+            'amount',
+            'registration',
+        ]
+        read_only_fields = [
+            'pk',
+            'user'
+        ]
+
+class MassAdditionSerializer(serializers.Serializer):
+    additions = AdditionSerializer(
+        many=True
+    )
+
+    def create(self, validated_data):
+        additions = []
+        for add_data in validated_data:
+            additions.append(
+                models.Addition(**add_data)
+            )
+        return models.Addition.objects.bulk_create(additions)
+
+# class PurchaseSerializer(serializers.ModelSerializer):
+    
+#     class Meta:
+#         model = models.Purchase
+#         fields = [
+#             ''
+#         ]
+
+##################################################################
+#############               Removals            ##################
+################################################################## 
 
 class ConsumerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Consumer
         fields = [
+            'pk',
             'type',
             'user',
             'dentist',
             'chamber',
             'patient',
             'other',
+        ]
+        read_only_fields = [
+            'pk'
         ]
 
 class RequestSerializer(serializers.ModelSerializer):
@@ -85,10 +152,14 @@ class RequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.ConsumptionRequest
         fields = [
+            'pk',
             'product',
             'registration',
             'amount',
             'note',
             'user',
             'consumer',
+        ]
+        read_only_fields = [
+            'pk'
         ]

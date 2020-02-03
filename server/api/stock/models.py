@@ -27,8 +27,11 @@ class Category(models.Model):
         verbose_name=_("Data do cadasto"),
         auto_now=True,
     )
+
+    def __str__(self):
+        return self.name
     
-    def get_amount(self):
+    def amount(self):
         products = list(self.products.all())
         amount = 0
         for product in products:
@@ -72,11 +75,15 @@ class Product(models.Model):
         ]
     )
 
+    def __str__(self):
+        return self.name
+
 ##################################################################
 #############               Additions            #################
 ##################################################################
 
 class Addition(models.Model):
+    objects = models.Manager()
     product = models.ForeignKey(
         Product,
         on_delete=models.DO_NOTHING,
@@ -96,12 +103,16 @@ class Addition(models.Model):
         validators=[validator_amount]
     )
 
+    def __str__(self):
+        return '+%s %s' % (self.amount, self.product)
+
     def save(self, *args, **kwargs):
         self.product.amount += self.amount
         self.product.save(update_fields=['amount'])
         return super(Addition, self).save(*args, **kwargs)
 
 class Purchase(models.Model):
+    objects = models.Manager()
     product = models.ForeignKey(
         Product,
         on_delete=models.DO_NOTHING,
@@ -126,6 +137,9 @@ class Purchase(models.Model):
         verbose_name=_('Valor'),
     )
 
+    def __str__(self):
+        return '+%s %s | R$%s' % (self.amount, self.product, self.value)
+
     def add(self):
         addittion = Addition(
             product=self.product,
@@ -144,6 +158,7 @@ class Purchase(models.Model):
 ##################################################################   
 
 class Removal(models.Model):
+    objects = models.Manager()
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
@@ -164,6 +179,9 @@ class Removal(models.Model):
         on_delete=models.DO_NOTHING,
         related_name='removals',        
     )
+
+    def __str__(self):
+        return '-%s %s' % (self.amount, self.product)
 
     def save(self, *args, **kwargs):
         if self.amount > self.product.amount:
@@ -191,6 +209,7 @@ class Consumer(models.Model):
         max_length=100,
         choices=TYPES
     )
+    objects = models.Manager()
     user = models.ForeignKey(
         User,
         on_delete=models.DO_NOTHING,
@@ -216,6 +235,9 @@ class Consumer(models.Model):
         verbose_name=_("Data do cadasto"),
         auto_now=True,
     )
+
+    def __str__(self):
+        return '%s: %s' % (self.type, dir(self)[self.type])
 
 class ConsumptionRequest(models.Model):
     objects = models.Manager()
@@ -249,7 +271,15 @@ class ConsumptionRequest(models.Model):
         max_length=300,
     )
 
+    def __str__(self):
+        return '%s: %s %s' % (
+            self.consumer,
+            self.amount,
+            self.product
+        )
+
 class Delivery(models.Model):
+    objects = models.Manager()
     request = models.OneToOneField(
         ConsumptionRequest,
         on_delete=models.DO_NOTHING,
@@ -275,6 +305,13 @@ class Delivery(models.Model):
         on_delete=models.DO_NOTHING,
         related_name='deliveries',        
     )
+
+    def __str__(self):
+        return '%s: %s %s' (
+            self.request,
+            self.amount,
+            self.product
+        )
 
     def remove(self):
         removal = Removal(
