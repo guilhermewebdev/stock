@@ -75,3 +75,11 @@ class AddictionsDetail(DetailView):
 class MassAdditionList(ListView):
     serializer_class = serializers.MassAdditionSerializer
     model = models.Addition
+
+class PurchaseList(ListView):
+    serializer_class = serializers.PurchaseSerializer
+    model = models.Purchase
+
+class PurchaseDetail(DetailView):
+    serializer_class = serializers.PurchaseSerializer
+    model = models.Purchase

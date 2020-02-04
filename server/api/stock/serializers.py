@@ -102,13 +102,23 @@ class MassAdditionSerializer(serializers.Serializer):
             )
         return models.Addition.objects.bulk_create(additions)
 
-# class PurchaseSerializer(serializers.ModelSerializer):
+class PurchaseSerializer(serializers.ModelSerializer):
     
-#     class Meta:
-#         model = models.Purchase
-#         fields = [
-#             ''
-#         ]
+    class Meta:
+        model = models.Purchase
+        fields = [
+            'pk',
+            'product',
+            'user',
+            'registration',
+            'amount',
+            'value',
+        ]
+        read_only_fields = [
+            'pk',
+            'registration',
+            'user',
+        ]
 
 ##################################################################
 #############               Removals            ##################
@@ -128,7 +138,8 @@ class ConsumerSerializer(serializers.ModelSerializer):
             'other',
         ]
         read_only_fields = [
-            'pk'
+            'pk',
+            'user',
         ]
 
 class RequestSerializer(serializers.ModelSerializer):
@@ -161,5 +172,6 @@ class RequestSerializer(serializers.ModelSerializer):
             'consumer',
         ]
         read_only_fields = [
-            'pk'
+            'pk',
+            'user',
         ]
