@@ -30,6 +30,8 @@ urlpatterns = [
     path('categories/<int:categorie>/products/<int:pk>/', stock.ProductDetail.as_view()),
     path('requests/', stock.RequestList.as_view()),
     path('requests/<int:pk>/', stock.RequestDetail.as_view()),
-    path('purchase/', stock.PurchaseList.as_view()),
-    path('purchase/<int:pk>/', stock.PurchaseDetail.as_view()),
+    path('purchases/', stock.PurchaseList.as_view()),
+    path('purchases/<int:pk>/', stock.PurchaseDetail.as_view()),
+    path('removals/', stock.RemovalList.as_view()),
+    path('removals/<int:pk>/', stock.RemovalDetail.as_view()),
 ]

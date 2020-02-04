@@ -14,10 +14,7 @@ class ListView(generics.ListAPIView,
         return self.create(request, *args, **kwargs)
 
     def get_queryset(self):
-        return get_list_or_404(
-            self.model,
-            **self.kwargs
-        )
+        return self.model.objects.filter(**self.kwargs).order_by('registration').reverse().all()
 
 class DetailView(generics.GenericAPIView,
             mixins.DestroyModelMixin,
@@ -63,6 +60,14 @@ class RequestList(ListView):
 class RequestDetail(DetailView):
     model = models.ConsumptionRequest
     serializer_class = serializers.RequestSerializer
+
+class RemovalList(ListView):
+    model = models.Removal
+    serializer_class = serializers.RemovalSerializer
+
+class RemovalDetail(DetailView):
+    model = models.Removal
+    serializer_class = serializers.RemovalSerializer
 
 class AddictionsList(ListView):
     serializer_class = serializers.AdditionSerializer

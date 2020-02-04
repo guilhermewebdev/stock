@@ -175,3 +175,25 @@ class RequestSerializer(serializers.ModelSerializer):
             'pk',
             'user',
         ]
+
+class RemovalSerializer(serializers.ModelSerializer):
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        data = {**validated_data, 'user': user}
+        return super(RemovalSerializer, self).create(data)
+
+    class Meta:
+        model = models.Removal
+        fields = [
+            'pk',
+            'product',
+            'amount',
+            'registration',
+            'user',
+        ]
+        read_only_fields = [
+            'pk',
+            'user',
+            'registration',
+        ]
