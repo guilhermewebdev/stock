@@ -197,3 +197,21 @@ class RemovalSerializer(serializers.ModelSerializer):
             'user',
             'registration',
         ]
+
+class DeliverySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Delivery
+        fields = [
+            'pk',
+            'request',
+            'product',
+            'registration',
+            'amount',
+            'user',
+        ]
+        read_only_fields = [
+            'pk',
+            'user',
+            'registration',
+        ]

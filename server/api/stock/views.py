@@ -53,11 +53,19 @@ class CategoryDetail(DetailView):
     model = models.Category
     serializer_class = serializers.CategoryListSerializer
 
-class RequestList(ListView):
+class ConsumerList(ListView):
+    model = models.Consumer
+    serializer_class = serializers.ConsumerSerializer
+
+class ConsumerDetail(DetailView):
+    model = models.Consumer
+    serializer_class = serializers.ConsumerSerializer
+
+class ConsumptionRequestList(ListView):
     model = models.ConsumptionRequest
     serializer_class = serializers.RequestSerializer
 
-class RequestDetail(DetailView):
+class ConsumptionRequestDetail(DetailView):
     model = models.ConsumptionRequest
     serializer_class = serializers.RequestSerializer
 
@@ -68,6 +76,14 @@ class RemovalList(ListView):
 class RemovalDetail(DetailView):
     model = models.Removal
     serializer_class = serializers.RemovalSerializer
+
+class DeliveryList(ListView):
+    model = models.Delivery
+    serializer_class = serializers.DeliverySerializer
+
+class DeliveryDetail(DetailView):
+    model = models.Delivery
+    serializer_class = serializers.DeliverySerializer
 
 class AddictionsList(ListView):
     serializer_class = serializers.AdditionSerializer
