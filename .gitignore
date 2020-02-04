@@ -38,3 +38,4 @@ server/api/stock/migrations/__pycache__/0025_addition_purchase.cpython-38.pyc
 server/api/stock/migrations/__pycache__/0026_auto_20200131_1851.cpython-38.pyc
 server/api/stock/migrations/__pycache__/0027_auto_20200131_1903.cpython-38.pyc
 server/api/stock/__pycache__/tests.cpython-38.pyc
+.vscode
