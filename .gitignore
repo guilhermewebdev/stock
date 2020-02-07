@@ -40,3 +40,5 @@ server/api/stock/migrations/__pycache__/0027_auto_20200131_1903.cpython-38.pyc
 server/api/stock/__pycache__/tests.cpython-38.pyc
 .vscode/
 .vscode/.ropeproject/objectdb
+server/api/static/
+server/proxy/nginx/logs/stock.log
