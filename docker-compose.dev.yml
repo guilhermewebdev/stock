@@ -1,6 +1,19 @@
 version: "3.7"
 
-services: 
+services:
+    client:
+        build: 
+            context: ./client/web/app/
+            dockerfile: Dockerfile.dev
+        restart: always
+        volumes: 
+            - ./client/web/app:/app
+        command: npm run serve
+        networks: 
+            backend:
+                ipv4_address: 172.35.10.30
+        depends_on: 
+            - api
     api:
         build: 
             context: ./server/api/

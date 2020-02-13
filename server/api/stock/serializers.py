@@ -71,8 +71,8 @@ class AdditionSerializer(serializers.ModelSerializer):
     )
 
     def create(self, validated_data):
-        addition = self.context['request'].user.additions.all().create(**validated_data)
-        addition.save()
+        print('\n\n\n\n\n', validated_data, '\n\n\n\n\n\n\n')
+        addition = self.context['view'].get_queryset().create(**validated_data, user=self.context['request'].user)
         return addition
 
     class Meta:

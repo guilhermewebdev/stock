@@ -32,7 +32,7 @@ class Category(models.Model):
         return self.name
     
     def amount(self):
-        products = list(self.products.all())
+        products = list(self.products.values('amount'))
         amount = 0
         for product in products:
             amount += product.amount
@@ -76,7 +76,7 @@ class Product(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return '%s: %s' % (self.name, self.amount)
 
 ##################################################################
 #############               Additions            #################
@@ -106,10 +106,20 @@ class Addition(models.Model):
     def __str__(self):
         return '+%s %s' % (self.amount, self.product)
 
+    def add(self):
+        if not 'saved' in dir(self):
+            self.product.amount += self.amount
+            self.product.save(update_fields=['amount'])
+            self.saved = True
+            return True
+        else:
+            return False
+
     def save(self, *args, **kwargs):
-        self.product.amount += self.amount
-        self.product.save(update_fields=['amount'])
-        return super(Addition, self).save(*args, **kwargs)
+        if(self.add()):
+            return super(Addition, self).save(*args, **kwargs)
+        else:
+            return False
 
 class Purchase(models.Model):
     objects = models.Manager()

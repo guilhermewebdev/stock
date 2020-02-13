@@ -31,6 +31,9 @@ class DetailView(generics.GenericAPIView,
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
 
+    def get_queryset(self):
+        return self.model.objects.filter(**self.kwargs).order_by('registration').reverse().all()
+
     def get_object(self):        
         return get_object_or_404(
             self.model,
