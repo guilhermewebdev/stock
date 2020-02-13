@@ -18,6 +18,8 @@ from django.urls import path, include
 from stock import views as stock
 
 api = [
+    path('sessions/', include('rest_auth.urls')),
+    path('sessions/registration/', include('rest_auth.registration.urls')),
     path('products/', stock.ProductList.as_view()),
     path('products/<int:pk>/', stock.ProductDetail.as_view()),
     path('products/<int:product>/additions/', stock.AddictionsList.as_view()),

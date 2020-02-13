@@ -1,3 +1,6 @@
 Django
 djangorestframework
 psycopg2
+django-rest-auth
+django-rest-auth[with_social]
+django-allauth
