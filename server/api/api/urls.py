@@ -18,16 +18,14 @@ from django.urls import path, include
 from stock import views as stock
 
 api = [
-    path('admin/', admin.site.urls),
     path('products/', stock.ProductList.as_view()),
-    path('products/additions/', stock.MassAdditionList.as_view()),
     path('products/<int:pk>/', stock.ProductDetail.as_view()),
     path('products/<int:product>/additions/', stock.AddictionsList.as_view()),
     path('products/<int:product>/additions/<int:pk>/', stock.AddictionsDetail.as_view()),
     path('categories/', stock.CategoryList.as_view()),
     path('categories/<int:pk>/', stock.CategoryDetail.as_view()),
-    path('categories/<int:categorie>/products/', stock.ProductList.as_view()),
-    path('categories/<int:categorie>/products/<int:pk>/', stock.ProductDetail.as_view()),
+    path('categories/<int:category>/products/', stock.ProductList.as_view()),
+    path('categories/<int:category>/products/<int:pk>/', stock.ProductDetail.as_view()),
     path('requests/consum/', stock.ConsumptionRequestList.as_view()),
     path('requests/consum/<int:pk>/', stock.ConsumptionRequestDetail.as_view()),
     path('purchases/', stock.PurchaseList.as_view()),

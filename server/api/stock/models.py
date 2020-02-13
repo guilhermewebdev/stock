@@ -35,7 +35,7 @@ class Category(models.Model):
         products = list(self.products.values('amount'))
         amount = 0
         for product in products:
-            amount += product.amount
+            amount += product['amount']
         return amount
 
 class Product(models.Model):
@@ -106,7 +106,7 @@ class Addition(models.Model):
     def __str__(self):
         return '+%s %s' % (self.amount, self.product)
 
-    def add(self):
+    def __add(self):
         if not 'saved' in dir(self):
             self.product.amount += self.amount
             self.product.save(update_fields=['amount'])
@@ -115,11 +115,22 @@ class Addition(models.Model):
         else:
             return False
 
-    def save(self, *args, **kwargs):
-        if(self.add()):
-            return super(Addition, self).save(*args, **kwargs)
+    def __remove(self):
+        if not 'deleted' in dir(self) and (self.product.amount - self.amount >= 0):
+            self.product.amount -= self.amount
+            self.product.save(update_fields=['amount'])
+            self.deleted = True
+            return True
         else:
             return False
+
+    def delete(self, *args, **kwargs):
+        self.__remove()
+        return super(Addition, self).delete(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        self.__add()
+        return super(Addition, self).save(*args, **kwargs)        
 
 class Purchase(models.Model):
     objects = models.Manager()
