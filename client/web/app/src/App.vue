@@ -10,7 +10,7 @@
           alt="Vuetify Logo"
           class="shrink mr-2"
           contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
+          src="https://caio.odo.br/static/imagens/logo/logo-desenho.png"
           transition="scale-transition"
           width="40"
         />
@@ -20,7 +20,7 @@
           class="shrink mt-1 hidden-sm-and-down"
           contain
           min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
+          src="https://caio.odo.br/static/imagens/logo/logo-maior-1080_Kq4TX1E.png"
           width="100"
         />
       </div>
@@ -38,7 +38,7 @@
     </v-app-bar>
 
     <v-content>
-      <HelloWorld/>
+      <router-view></router-view>
     </v-content>
   </v-app>
 </template>
@@ -51,7 +51,6 @@ export default Vue.extend({
   name: 'App',
 
   components: {
-    HelloWorld,
   },
 
   data: () => ({
