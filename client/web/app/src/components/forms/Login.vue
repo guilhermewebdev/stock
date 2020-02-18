@@ -1,5 +1,9 @@
 <template>
-    <v-form ref="form">
+    <v-form
+        ref="form"
+        autocomplete="off"
+        @keypress.native.enter="submit"
+    >
         <v-container fluid>
             <v-row>
                 <v-col
@@ -10,6 +14,8 @@
                         v-model="form.username"
                         label='Nome de usuário'
                         class="mt-0"
+                        :rules="[rules.required]"
+                        autocomplete="off"
                     ></v-text-field>
                 </v-col>
                 <v-col
@@ -21,10 +27,11 @@
                         class="mt-0"
                         label='Senha'
                         :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
-                        :rules="[rules.required, rules.min]"
                         :type="show1 ? 'text' : 'password'"
                         name="input-10-1"
+                        :rules="[rules.required, rules.min]"
                         hint="At least 8 characters"
+                        autocomplete="off"
                         :aria-autocomplete="false"
                         counter
                         @click:append="show1 = !show1"
@@ -37,6 +44,7 @@
                         block
                         color="primary"
                         @click="submit"
+                        :loading="loading"
                     >
                         Entrar
                     </v-btn>
@@ -47,7 +55,8 @@
 </template>
 <script lang="ts">
 import Vue from 'vue';
-import connect from '@/connect';
+import app from '../../sdk';
+
 export default Vue.extend({
     name: 'form-login',
     data(){
@@ -56,22 +65,26 @@ export default Vue.extend({
             show1: false,
             rules: {
                 required: v => !!v || "É preciso informar a senha",
-                min: v => v >= 8 || "A senha deve conter pelo menos 8 caractéres"
-            }
+                min: v => v.length >= 8 || "A senha deve conter pelo menos 8 caractéres"
+            },
+            loading:false,
         }
     },
     methods: {
         validate(){
             return this.$refs.form.validate()
         },
+        toggleLoading(){
+            this.loading = !this.loading;
+        },
         async submit() {
+            this.toggleLoading()
             if(this.validate()){
-                connect.post('/sessions/login.json', this.form)
-                .then((result) => {
-                    alert(result)
-                }).catch((err) => {
-                    alert(err)
-                });
+                app.sessions.login(this.form)
+                    .then(() => {
+                        this.toggleLoading()
+                    })
+                    .catch(this.toggleLoading)
             }
         }
     }

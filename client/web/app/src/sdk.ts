@@ -38,8 +38,9 @@ interface CRUD extends Hierarchy, Reactive {
     item?:any;
     selected?:number;
     key:string;
+    haveItems:boolean;
     loadList:Function;
-    getUrl:Function;
+    getURL:Function;
     loadItem:Function;
     getURLItem:Function;
     createItem:Function;
@@ -63,7 +64,10 @@ async function request(method:Method, url:string, data?:any):Promise<any>{
 const reaction:Reactive = {
     observers: [],
     async notifyObservers(){
-        iterate(this.observers, (observer:Function) => observer(this))
+        iterate(this.observers, (observer:Function) => {
+            if(observer) observer(this)
+        })
+        if('father' in this) this.father.notifyObservers()
     },
     async addObserver(observer:Function){
         this.observers.push(observer)
@@ -92,15 +96,17 @@ const hiearachy:Hierarchy = {
 const crud:CRUD = {
     ...hiearachy,
     ...reaction,
+    haveItems: true,
     key: 'pk',
+    list: [],
     async loadList(){
-        return request('GET', this.getUrl('/?format=json'))
+        return request('GET', this.getURL('/?format=json'))
             .then((data:Array<any>) => {
                 this.list = data
                 this.notifyObservers()
             })
     },
-    getUrl(sufix:string = ''){
+    getURL(sufix:string = ''){
         if(this.father){
             return `${this.father.getURLItem()}${this.url}${sufix}`
         }else{
@@ -109,17 +115,26 @@ const crud:CRUD = {
     },
     getURLItem(item?:number, sufix:string = ''){
         if(this.father){
-            if(this.selected && !item){            
-                return `${this.father.getURLItem()}${this.url}/${this.selected}${sufix}`
-            }else if(item){
-                return `${this.father.getURLItem()}${this.url}/${item}${sufix}`
-            }else throw new Error('É preciso informar um item')
+            if(this.haveItems){
+                if(this.selected && !item){            
+                    return `${this.father.getURLItem()}${this.url}/${this.selected}${sufix}`
+                }else if(item){
+                    return `${this.father.getURLItem()}${this.url}/${item}${sufix}`
+                }else throw new Error('É preciso selecionar um item')
+            }else{
+                return `${this.father.getURLItem()}${this.url}${sufix}`
+            }
         }else {
-            if(this.selected && !item){            
-                return `${this.url}/${this.selected}${sufix}`
-            }else if(item){
-                return `${this.url}/${item}${sufix}`
-            }else throw new Error('É preciso informar um item')
+            if(this.haveItems){
+            alert(this)
+                if(this.selected && !item){            
+                    return `${this.url}/${this.selected}${sufix}`
+                }else if(item){
+                    return `${this.url}/${item}${sufix}`
+                }else throw new Error('É preciso selecionar um item')
+            }else{
+                return `${this.url}${sufix}`
+            }
         }
     },
     async loadItem(item:number){
@@ -143,9 +158,9 @@ const crud:CRUD = {
         });
     },
     async createItem(data:any){
-        return request('POST', this.getUrl('/?format=json'), data)
+        return request('POST', this.getURL('/?format=json'), data)
             .then((data:any) => {
-                this.list?.push(data)
+                this.list.push(data)
                 this.notifyObservers()
             });
     },
@@ -175,6 +190,7 @@ const crud:CRUD = {
 
 const app:CRUD|any = {
     ...crud,
+    haveItems: false,
     url: 'http://localhost/api',
     async mount(){
         this.sessions.checkAuth()
@@ -184,15 +200,11 @@ const app:CRUD|any = {
 app.addChild({
     ...crud,
     async login(credentials:Credentials){
-        return new Promise((accept, reject) => {
-            connect.post('/sessions/login/?format=json', credentials)
-                .then(response =>{
-                     accept(response.data)
-                     this.isAuthenticated = true;
-                     this.checkAuth()
+            return request('POST', this.getURL('/login/?format=json'), credentials)
+                .then(re => {
+                    this.isAuthenticated = true;
+                    this.checkAuth()
                 })
-                .catch(reject)
-        });
     },
     async logout(){
         return new Promise((accept, reject) => {
@@ -220,7 +232,8 @@ app.addChild({
     },
     isAuthenticated: false,
     user: {},
-    url: '/sessions'
+    url: '/sessions',
+    haveItems: false,
 }, 'sessions')
 
 app.sessions.addChild({
@@ -232,7 +245,14 @@ app.sessions.addChild({
     },
     url: '/password',
     ...crud,
+    haveItems: false,
 }, 'password')
+
+app.sessions.addChild({
+    ...crud,
+    haveItems: false,
+    url: '/user'
+}, 'user')
 
 app.addMultipleChilds({
     products: {

@@ -28,6 +28,7 @@
 </template>
 <script lang="ts">
 import Vue from 'vue'
+import app from '../sdk';
 import FormLogin from '@/components/forms/Login.vue'
 export default Vue.extend({
     components: {
