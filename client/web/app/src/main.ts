@@ -8,13 +8,16 @@ import app from '@/sdk';
 
 Vue.config.productionTip = false
 
+app.sessions.addObserver((sessions:any) => {
+  if(sessions.isAuthenticated !== undefined) store.commit('setAuth', sessions.isAuthenticated)
+})
+
 new Vue({
   router,
   store,
   vuetify,
   render: h => h(App),
-  beforeCreate(){
+  beforeMount(){
     app.mount()
-    console.log(app)
   }
 }).$mount('#app')

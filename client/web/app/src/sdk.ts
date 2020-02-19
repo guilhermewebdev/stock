@@ -21,13 +21,13 @@ interface Credentials {
 
 interface Reactive {
     observers:Array<Function>;
+    father?:CRUD;
     notifyObservers:Function;
     addObserver:Function;
     resetObservers:Function;
 }
 
 interface Hierarchy {
-    father?:CRUD;
     addChild:Function;
     addMultipleChilds:Function;
 }
@@ -193,22 +193,22 @@ const app:CRUD|any = {
     haveItems: false,
     url: 'http://localhost/api',
     async mount(){
-        this.sessions.checkAuth()
+        return this.sessions.checkAuth()
     }
 }
 
 app.addChild({
     ...crud,
+    observers: [],
     async login(credentials:Credentials){
             return request('POST', this.getURL('/login/?format=json'), credentials)
-                .then(re => {
-                    this.isAuthenticated = true;
-                    this.checkAuth()
+                .then(() => {
+                    this.checkAuth()                    
                 })
     },
     async logout(){
         return new Promise((accept, reject) => {
-            return request('DELETE', this.getURL('/logout/?format=json'))
+            return request('POST', this.getURL('/logout/?format=json'))
                 .then(re => {
                     this.isAuthenticated = false;
                     this.user = {};
@@ -237,6 +237,8 @@ app.addChild({
 }, 'sessions')
 
 app.sessions.addChild({
+    ...crud,
+    observers: [],
     async reset(data:any){
         return request('POST', this.getURL('/reset/?format=json'), data)
     },
@@ -244,12 +246,12 @@ app.sessions.addChild({
         return request('POST', this.getURL('/change/?format=json'), data)        
     },
     url: '/password',
-    ...crud,
     haveItems: false,
 }, 'password')
 
 app.sessions.addChild({
     ...crud,
+    observers: [],
     haveItems: false,
     url: '/user'
 }, 'user')
@@ -257,46 +259,56 @@ app.sessions.addChild({
 app.addMultipleChilds({
     products: {
         ...crud,
+        observers: [],
         url: '/products'
     },
     categories: {
         ...crud,
+        observers: [],
         url: '/categories'
     },
     requests: {
         ...crud,
+        observers: [],
         url: '/requests'
     },
     purchases: {
         ...crud,
+        observers: [],
         url: '/purchases'
     },
     removals: {
         ...crud,
+        observers: [],
         url: '/removals'
     },
     consumers: {
         ...crud,
+        observers: [],
         url: '/consumers',
     },
     deliveries: {
         ...crud,
+        observers: [],
         url: '/deliveries'
     }
 })
 
 app.requests.addChild({
     ...crud,
+    observers: [],
     url: '/consum'
 }, 'consum')
 
 app.products.addChild({
     ...crud,
+    observers: [],
     url: '/additions'
 }, 'additions')
 
 app.categories.addChild({
     ...crud,
+    observers: [],
     url: '/products'
 }, 'products')
 

@@ -5,7 +5,7 @@
       color="primary"
       dark
     >
-      <div class="d-flex align-center">
+      <a to="/" class="d-flex align-center">
         <v-img
           alt="Vuetify Logo"
           class="shrink mr-2"
@@ -14,30 +14,25 @@
           transition="scale-transition"
           width="40"
         />
-
         <v-img
           alt="Vuetify Name"
           class="shrink mt-1 hidden-sm-and-down"
           contain
           min-width="100"
           src="https://caio.odo.br/static/imagens/logo/logo-maior-1080_Kq4TX1E.png"
-          width="100"
+          width="150"
         />
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
+      </a>      
+      <v-progress-linear
+        indeterminate
+        color="#ADFF2F"
+        bottom
+        fixed
+        v-show="loading"
+      ></v-progress-linear>
     </v-app-bar>
-
-    <v-content>
+    <v-content style="heigth:100%;">
+      <navigation v-if="authenticated"></navigation>
       <router-view></router-view>
     </v-content>
   </v-app>
@@ -45,16 +40,29 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import HelloWorld from './components/HelloWorld.vue';
+import Navigation from '@/components/Navigation';
 
 export default Vue.extend({
   name: 'App',
-
   components: {
+    Navigation
   },
-
+  computed: {
+    loading(){
+      return this.$store.state.loading;
+    },
+    authenticated(){
+      return this.$store.state.isAuthenticated;
+    }
+  },
   data: () => ({
     //
   }),
+  mounted(){
+    if(!this.$store.state.isAuthenticated) this.$router.push('/')
+  },
+  beforeUpdate(){
+    if(!this.$store.state.isAuthenticated) this.$router.push('/')
+  }
 });
 </script>

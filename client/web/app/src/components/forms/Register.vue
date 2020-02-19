@@ -23,9 +23,45 @@
                     cols="12"
                 >
                     <v-text-field
-                        v-model="form.password"
+                        v-model="form.email"
                         class="mt-0"
-                        label='Senha'
+                        label='E-mail'
+                        type="email"
+                        name="input-10-1"
+                        :rules="[rules.required, rules.min]"
+                        hint="At least 8 characters"
+                        autocomplete="off"
+                        :aria-autocomplete="false"
+                        counter
+                    ></v-text-field>
+                </v-col>
+                <v-col
+                    class="px-0 pt-0"
+                    cols="12"
+                >
+                    <v-text-field
+                        v-model="form.password1"
+                        class="mt-0"
+                        label='Crie uma senha'
+                        :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
+                        :type="show1 ? 'text' : 'password'"
+                        name="input-10-1"
+                        :rules="[rules.required, rules.min]"
+                        hint="At least 8 characters"
+                        autocomplete="off"
+                        :aria-autocomplete="false"
+                        counter
+                        @click:append="show1 = !show1"
+                    ></v-text-field>
+                </v-col>
+                <v-col
+                    class="px-0 pt-0"
+                    cols="12"
+                >
+                    <v-text-field
+                        v-model="form.password2"
+                        class="mt-0"
+                        label='Confirme a senha'
                         :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
                         :type="show1 ? 'text' : 'password'"
                         name="input-10-1"
@@ -46,7 +82,7 @@
                         @click="submit"
                         :loading="loading"
                     >
-                        Entrar
+                        Cadastrar
                     </v-btn>
                 </v-col>
             </v-row>
@@ -54,11 +90,11 @@
     </v-form>
 </template>
 <script lang="ts">
-import Vue from 'vue';
-import app from '../../sdk';
+import Vue from 'vue'
+import app from '@/sdk';
 
 export default Vue.extend({
-    name: 'form-login',
+    name: "form-register",
     data(){
         return {
             form: {},
@@ -83,7 +119,7 @@ export default Vue.extend({
         async submit() {
             this.toggleLoading()
             if(this.validate()){
-                app.sessions.login(this.form)
+                app.sessions.register(this.form)
                     .then(() => {
                         this.toggleLoading()
                         this.$router.push('/home')
@@ -94,7 +130,7 @@ export default Vue.extend({
                         this.notify('danger', err.reponse.data)
                     })
             }
-        }
-    }
+        },        
+    },
 })
 </script>
