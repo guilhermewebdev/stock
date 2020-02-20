@@ -260,13 +260,9 @@ class Consumer(models.Model):
     def __str__(self):
         return '%s: %s' % (self.type, dir(self)[self.type])
 
+
 class ConsumptionRequest(models.Model):
-    objects = models.Manager()
-    product = models.ForeignKey(
-        Category,
-        on_delete=models.DO_NOTHING,
-        related_name='requests'
-    )
+    objects = models.Manager()    
     user = models.ForeignKey(
         User,
         on_delete=models.DO_NOTHING,
@@ -280,6 +276,20 @@ class ConsumptionRequest(models.Model):
     registration = models.DateTimeField(
         verbose_name=_('Data da requisição'),
         auto_now=True,
+    )    
+    note = models.CharField(
+        verbose_name=_('Observação'),
+        max_length=300,
+    )
+
+
+
+class ProductComsuptionRequest(models.Model):
+    objects = models.Manager()    
+    product = models.ForeignKey(
+        Category,
+        on_delete=models.DO_NOTHING,
+        related_name='requests'
     )
     amount = models.IntegerField(
         verbose_name=_('Quantidade'),
@@ -287,16 +297,16 @@ class ConsumptionRequest(models.Model):
             validator_amount
         ]
     )
-    note = models.CharField(
-        verbose_name=_('Observação'),
-        max_length=300,
+    request = models.ForeignKey(
+        ConsumptionRequest,
+        on_delete=models.CASCADE,
+        related_name='products'
     )
 
     def __str__(self):
-        return '%s: %s %s' % (
-            self.consumer,
-            self.amount,
-            self.product
+        return '%s: %s' % (
+            self.product,
+            self.amount
         )
 
 class Delivery(models.Model):

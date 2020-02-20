@@ -4,6 +4,7 @@
           permanent
           absolute
           expand-on-hover
+          mini-variant
         >
           <v-list>
             <v-list-item class="px-2">

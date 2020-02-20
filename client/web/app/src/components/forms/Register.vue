@@ -110,7 +110,7 @@ export default Vue.extend({
         validate(){
             return this.$refs.form.validate()
         },
-        toggleLoading(){
+        async toggleLoading(){
             this.loading = !this.loading;
         },
         notify(type, message){
@@ -119,7 +119,7 @@ export default Vue.extend({
         async submit() {
             this.toggleLoading()
             if(this.validate()){
-                app.sessions.register(this.form)
+                return app.sessions.register(this.form)
                     .then(() => {
                         this.toggleLoading()
                         this.$router.push('/home')

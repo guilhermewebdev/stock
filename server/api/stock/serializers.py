@@ -142,31 +142,65 @@ class ConsumerSerializer(serializers.ModelSerializer):
             'user',
         ]
 
+class ComsumRequestSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.ProductComsuptionRequest
+        fields = [
+            'pk',
+            'product',
+            'amount',
+        ]
+        read_only_fields = [
+            'pk',
+        ]
+        extra_kwargs = dict(
+            amount=dict(
+                required=True,
+                label=_('Quantidade')
+            ),
+            product=dict(
+                required=True,
+                label=_('Produto')
+            )
+        )
+
 class RequestSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
         read_only=True,
+    )
+    products = ComsumRequestSerializer(
+        many=True,
+        label=_('Produtos'),
+        required=True,
     )
     consumer = ConsumerSerializer(
         label=_('Consumidor'),
         required=True,
     )
-    amount = serializers.IntegerField(
-        required=True,
-        label=_('Quantidade')
-    )
 
     def create(self, validated_data):
         user = self.context['request'].user
+        products = validated_data.pop('products')
         data = {**validated_data, 'user': user}
-        return super(RequestSerializer, self).create(data)
-    
+        requests = []
+        request = self.Meta.model(**data)
+        for product in products:
+            requests.append(
+               models.ProductComsuptionRequest(
+                    **product,
+                    request=request
+               )
+            )
+        models.ProductComsuptionRequest.objects.bulk_create(requests)
+        return request
+
     class Meta:
         model = models.ConsumptionRequest
         fields = [
             'pk',
-            'product',
+            'products',
             'registration',
-            'amount',
             'note',
             'user',
             'consumer',
@@ -174,6 +208,7 @@ class RequestSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'pk',
             'user',
+            'registration',
         ]
 
 class RemovalSerializer(serializers.ModelSerializer):
