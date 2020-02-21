@@ -141,7 +141,7 @@ const crud:CRUD = {
         return request('GET', this.getURLItem(item))
             .then((data:any) =>{
                 this.item = data
-                this.key = this.item[this.key];
+                this.selected = this.item[this.key];
                 this.notifyObservers()
             })
     },
