@@ -143,6 +143,11 @@ class ConsumerSerializer(serializers.ModelSerializer):
         ]
 
 class ComsumRequestSerializer(serializers.ModelSerializer):
+    products = serializers.PrimaryKeyRelatedField(
+        queryset=models.Category.objects.all(),
+        required=True,
+        label=_('Produto')
+    )
 
     class Meta:
         model = models.ProductComsuptionRequest
@@ -185,6 +190,7 @@ class RequestSerializer(serializers.ModelSerializer):
         data = {**validated_data, 'user': user}
         requests = []
         request = self.Meta.model(**data)
+        request.save()
         for product in products:
             requests.append(
                models.ProductComsuptionRequest(

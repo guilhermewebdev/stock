@@ -99,7 +99,7 @@ const crud:CRUD = {
     haveItems: true,
     key: 'pk',
     list: [],
-    async loadList(){
+    async loadList():Promise<any>{
         return request('GET', this.getURL('/?format=json'))
             .then((data:Array<any>) => {
                 this.list = data
