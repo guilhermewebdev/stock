@@ -30,10 +30,12 @@
                                     label="Produto"
                                     required
                                     autofocus
+                                    @click:append-outer="productsForms.splice(product, 1); ajustForms()"
+                                    :append-outer-icon="((product > 0) && (product == productsForms[productsForms.length-1]))?'mdi-close':''"
                                     v-model="request.products[product]"
                                     :loading="loadingProducts"
-                                    @focus="loadProducts"
                                     @change="addProduct"
+                                    @focus="loadProducts"
                                     :items="productsSugestions"
                                 ></v-autocomplete>
                             </v-col>
@@ -42,9 +44,10 @@
                                     label="Quantidade"
                                     type="number"
                                     required
+                                    :disabled="productsMax[request.products[product]] === 0? true:false"
                                     :max="productsMax[request.products[product]]"
                                     min='1'
-                                    value="1"
+                                    :value="productsMax[request.products[product]] === 0? 0:1"
                                 ></v-text-field>
                             </v-col>
                             <v-col cols="3">
@@ -130,7 +133,7 @@ export default {
                 }
             ],
             productsMax: {},
-            productsForms: [1],
+            productsForms: [0],
             request: {
                 products: [],
                 note: '',
@@ -153,10 +156,13 @@ export default {
             }
         }
     },
+    mounted(){
+        // this.loadProducts()
+    },
     methods: {
         async clear(){
             this.$refs.form.reset()
-            this.productsForms = []
+            this.productsForms = [0]
         },
         async loadProducts(){
             if(this.productsSugestions||this.products === []){
@@ -175,9 +181,14 @@ export default {
                     })
             }               
         },
+        ajustForms(){
+            this.productsForms.forEach((item, index) => {
+                this.productsForms[index] = index;
+            })
+        },
         async addProduct(){
-            this.productsForms.push(this.productsForms.length + 1   )
+            this.productsForms.push(this.productsForms.length)
         }
-    }
+    },
 }
 </script>
