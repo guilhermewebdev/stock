@@ -143,7 +143,7 @@ class ConsumerSerializer(serializers.ModelSerializer):
         ]
 
 class ComsumRequestSerializer(serializers.ModelSerializer):
-    products = serializers.PrimaryKeyRelatedField(
+    product = serializers.PrimaryKeyRelatedField(
         queryset=models.Category.objects.all(),
         required=True,
         label=_('Produto')

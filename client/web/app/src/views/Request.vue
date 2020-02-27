@@ -22,19 +22,21 @@
                 </v-list-item>
                 <v-form
                     ref="form"
+                    @keypress.native.enter="submit"
                 >
                     <v-container>
-                        <v-row v-for="product in productsForms" :key="product">
+                        <v-row v-for="(product, index) in request.products" :key="index">
                             <v-col cols="6">
                                 <v-autocomplete
                                     label="Produto"
                                     required
                                     autofocus
-                                    @click:append-outer="productsForms.splice(product, 1); ajustForms()"
-                                    :append-outer-icon="((product > 0) && (product == productsForms[productsForms.length-1]))?'mdi-close':''"
-                                    v-model="request.products[product]"
+                                    :rules="[rules.required]"
+                                    @click:append-outer="request.products.splice(index, 1);"
+                                    :append-outer-icon="(index > 0)?'mdi-close':''"
+                                    v-model="product.product"
                                     :loading="loadingProducts"
-                                    @change="addProduct"
+                                    @change="addProduct(index), product.amount = productsMax[product.product]==0?0:product.amount"
                                     @focus="loadProducts"
                                     :items="productsSugestions"
                                 ></v-autocomplete>
@@ -43,19 +45,19 @@
                                 <v-text-field
                                     label="Quantidade"
                                     type="number"
+                                    v-model="product.amount"
                                     required
-                                    :disabled="productsMax[request.products[product]] === 0? true:false"
-                                    :max="productsMax[request.products[product]]"
+                                    :disabled="productsMax[product.product] === 0? true:false"
+                                    :max="productsMax[product.product]"
                                     min='1'
-                                    :value="productsMax[request.products[product]] === 0? 0:1"
+                                    :value="productsMax[product.product]==0?0:1"
                                 ></v-text-field>
                             </v-col>
                             <v-col cols="3">
                                 <v-text-field
                                     label="Disponível"
                                     type="number"
-                                    required
-                                    :value="productsMax[request.products[product]]"
+                                    :value="productsMax[product.product]"
                                     disabled
                                 ></v-text-field>
                             </v-col>
@@ -64,11 +66,15 @@
                             <v-col cols='6'>
                                 <v-autocomplete
                                     label="Tipo de consumidor"
+                                    :rules="[rules.required]"
                                     :items="consumers"
+                                    v-model="request.consumer.type"
                                 ></v-autocomplete>
                             </v-col>
                             <v-col cols='6'>
                                 <v-text-field
+                                    :rules="[rules.required]"
+                                    v-model="request.consumer.consumer"
                                     label="Consumidor"
                                 ></v-text-field>
                             </v-col>
@@ -80,8 +86,8 @@
                                     filled 
                                     label="Observações"
                                     solo
+                                    @keypress.native.enter.stop
                                 >
-
                                 </v-textarea>
                             </v-col>
                         </v-row>
@@ -90,6 +96,7 @@
                 <v-card-actions>
                     <v-btn
                         color="primary"
+                        @click="submit"
                     >Solicitar</v-btn>
                     <v-btn
                         text
@@ -133,9 +140,16 @@ export default {
                 }
             ],
             productsMax: {},
-            productsForms: [0],
+            rules: {
+                required: v => !!v || 'É preciso preencher o campo!'
+            },
             request: {
-                products: [],
+                products: [
+                    {
+                        product: null,
+                        amount: 1,
+                    }
+                ],
                 note: '',
                 consumer: {
                     type: '',
@@ -156,13 +170,22 @@ export default {
             }
         }
     },
-    mounted(){
-        // this.loadProducts()
-    },
     methods: {
         async clear(){
             this.$refs.form.reset()
-            this.productsForms = [0]
+            this.$data.request = {
+                products: [
+                    {
+                        product: null,
+                        amount: 1,
+                    }
+                ],
+                note: '',
+                consumer: {
+                    type: '',
+                    consumer: '',
+                }
+            }
         },
         async loadProducts(){
             if(this.productsSugestions||this.products === []){
@@ -181,13 +204,21 @@ export default {
                     })
             }               
         },
-        ajustForms(){
-            this.productsForms.forEach((item, index) => {
-                this.productsForms[index] = index;
-            })
+        async submit(){
+            if(this.$refs.form.validate()){
+                console.log(this.form)
+                app.requests.consum.createItem(this.form)
+                    .then(() => alert('Enviado!'))
+                    .catch(err => alert(err))
+            }
         },
-        async addProduct(){
-            this.productsForms.push(this.productsForms.length)
+        async addProduct(product){
+            if(product === (this.request.products.length-1)){
+                this.request.products.push({
+                        product: null,
+                        amount: 1,
+                })
+            }
         }
     },
 }
