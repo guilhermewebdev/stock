@@ -37,6 +37,7 @@
                                     v-model="product.product"
                                     :loading="loadingProducts"
                                     @change="addProduct(index), product.amount = productsMax[product.product]==0?0:product.amount"
+                                    @blur.once="removeVoidProduct(index)"
                                     @focus="loadProducts"
                                     :items="productsSugestions"
                                 ></v-autocomplete>
@@ -60,6 +61,13 @@
                                     :value="productsMax[product.product]"
                                     disabled
                                 ></v-text-field>
+                            </v-col>
+                        </v-row>
+                        <v-row v-if="addButton">
+                            <v-col cols="3">
+                                <v-btn
+                                    @click="addProduct(request.products.length - 1)"
+                                >Adicionar</v-btn>
                             </v-col>
                         </v-row>
                         <v-row>
@@ -168,7 +176,10 @@ export default {
                     [this.request.consumer.type]: this.request.consumer.consumer
                 }
             }
-        }
+        },
+        addButton(){
+            return Boolean(this.request.products[this.request.products.length - 1].product)
+        },
     },
     methods: {
         async clear(){
@@ -212,12 +223,17 @@ export default {
                     .catch(err => alert(err))
             }
         },
-        async addProduct(product){
+        async addProduct(product:number){
             if(product === (this.request.products.length-1)){
                 this.request.products.push({
                         product: null,
                         amount: 1,
                 })
+            }
+        },
+        async removeVoidProduct(index:number){
+            if(!this.addButton && (index === (this.request.products.length - 1))){
+                this.request.products.splice(index, 1);
             }
         }
     },
