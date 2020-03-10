@@ -178,7 +178,7 @@ export default {
             }
         },
         addButton(){
-            return Boolean(this.request.products[this.request.products.length - 1].product)
+            return Boolean(this.request.products[this.request.products.length - 1].product || false)
         },
     },
     methods: {
@@ -220,19 +220,21 @@ export default {
                 console.log(this.form)
                 app.requests.consum.createItem(this.form)
                     .then(() => alert('Enviado!'))
-                    .catch(err => alert(err))
+                    .catch(err => console.log(err.response.data))
             }
         },
         async addProduct(product:number){
+            console.log(this.request.products)
             if(product === (this.request.products.length-1)){
                 this.request.products.push({
                         product: null,
                         amount: 1,
                 })
+                console.log(this.request.products)
             }
         },
         async removeVoidProduct(index:number){
-            if(!this.addButton && (index === (this.request.products.length - 1))){
+            if(!this.addButton && (index === (this.request.products.length - 1)) && index > 0){
                 this.request.products.splice(index, 1);
             }
         }

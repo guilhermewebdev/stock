@@ -108,7 +108,7 @@ const crud:CRUD = {
     },
     getURL(sufix:string = ''){
         if(this.father){
-            return `${this.father.getURLItem()}${this.url}${sufix}`
+            return `${this.father.getURLItem() || this.father.getURL()}${this.url}${sufix}`
         }else{
             return `${this.url}${sufix}`
         }
@@ -120,7 +120,7 @@ const crud:CRUD = {
                     return `${this.father.getURLItem()}${this.url}/${this.selected}${sufix}`
                 }else if(item){
                     return `${this.father.getURLItem()}${this.url}/${item}${sufix}`
-                }else throw new Error('É preciso selecionar um item')
+                }else return;
             }else{
                 return `${this.father.getURLItem()}${this.url}${sufix}`
             }
@@ -131,7 +131,7 @@ const crud:CRUD = {
                     return `${this.url}/${this.selected}${sufix}`
                 }else if(item){
                     return `${this.url}/${item}${sufix}`
-                }else throw new Error('É preciso selecionar um item')
+                }else return;
             }else{
                 return `${this.url}${sufix}`
             }

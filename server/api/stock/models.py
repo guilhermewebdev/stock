@@ -231,26 +231,9 @@ class Consumer(models.Model):
         choices=TYPES
     )
     objects = models.Manager()
-    user = models.ForeignKey(
-        User,
-        on_delete=models.DO_NOTHING,
-        related_name='consumption'
-    )
-    dentist = models.CharField(
-        verbose_name=_('Dentista'),
-        max_length=100,
-    )
-    chamber = models.CharField(
-        verbose_name=_('Consultório'),
-        max_length=100,
-    )
-    patient = models.CharField(
-        verbose_name=_('Paciente'),
-        max_length=100,
-    )
-    other = models.CharField(
-        verbose_name=_('Outro'),
-        max_length=100,
+    consumer = models.CharField(
+        verbose_name=_('Consumidor'),
+        max_length=200,
     )
     registration = models.DateTimeField(
         verbose_name=_("Data do cadasto"),

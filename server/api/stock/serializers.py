@@ -131,11 +131,7 @@ class ConsumerSerializer(serializers.ModelSerializer):
         fields = [
             'pk',
             'type',
-            'user',
-            'dentist',
-            'chamber',
-            'patient',
-            'other',
+            'consumer',
         ]
         read_only_fields = [
             'pk',
@@ -179,7 +175,8 @@ class RequestSerializer(serializers.ModelSerializer):
         label=_('Produtos'),
         required=True,
     )
-    consumer = ConsumerSerializer(
+    consumer = serializers.PrimaryKeyRelatedField(
+        queryset=models.Consumer.objects.none(),
         label=_('Consumidor'),
         required=True,
     )

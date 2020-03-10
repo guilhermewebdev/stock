@@ -33,6 +33,7 @@ services:
                 ipv4_address: 172.35.10.10
         depends_on: 
             - db
+            - proxy
             
     db:
         image: postgres
@@ -63,8 +64,6 @@ services:
         ports: 
             - 80:80
             - 443:443
-        depends_on: 
-            - api
 
 networks: 
     backend:
