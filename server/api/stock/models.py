@@ -263,6 +263,8 @@ class ConsumptionRequest(models.Model):
     note = models.CharField(
         verbose_name=_('Observação'),
         max_length=300,
+        null=True,
+        blank=True,
     )
 
 
