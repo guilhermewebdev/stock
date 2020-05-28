@@ -75,4 +75,4 @@ networks:
         driver: bridge
         ipam:
             config: 
-                - subnet: 172.25.20.1/32
+                - subnet: 172.25.20.1/16
