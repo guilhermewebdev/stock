@@ -17,11 +17,11 @@ services:
     api:
         build: 
             context: ./server/api/
-            dockerfile: Dockerfile.dev
+            dockerfile: Dockerfile
         restart: always
         volumes:
             - ./server/api:/code
-        command: ./manage.py runserver 0.0.0.0:5804
+        command: bash main.sh
         environment: 
             DB_NAME: clinica
             DB_USER: centroavancado
