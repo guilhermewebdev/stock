@@ -1,6 +1,18 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import app from '@/sdk'
+import VuexORM from "@vuex-orm/core";
+import VuexORMAxios from "@vuex-orm/plugin-axios";
+import connect from '@/connect';
+import { Product } from '@/models';
+
+VuexORM.use(VuexORMAxios, { axios: connect });
+
+const database = new VuexORM.Database();
+
+database.register(Product);
+
+export const plugins = [VuexORM.install(database)];
 
 Vue.use(Vuex)
 
@@ -27,5 +39,6 @@ export default new Vuex.Store({
     }
   },
   modules: {
-  }
+  },
+  plugins
 })
