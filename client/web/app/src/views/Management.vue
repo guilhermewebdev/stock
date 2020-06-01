@@ -7,16 +7,14 @@
 
           <v-spacer></v-spacer>
 
-          <v-btn icon>
-            <v-icon>mdi-plus</v-icon>
-          </v-btn>
+          <CreateCategory v-on:created="refresh" />
           <v-btn icon>
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
         </v-toolbar>
         <v-list class="flex-grow-1 h-100">
           <template v-for="(item) in categories">
-            <v-list-item :to='`/management/cat/${item.pk}/`' :key="item.pk">
+            <v-list-item :to="`/management/cat/${item.pk}/`" :key="item.pk">
               <v-list-item-content>
                 <v-list-item-title v-html="item.name"></v-list-item-title>
                 <v-list-item-subtitle v-html="`Quantidade disponível: ${item.amount}`"></v-list-item-subtitle>
@@ -33,15 +31,27 @@
 import Vue from "vue";
 import app from "@/sdk";
 import { Category } from "../models";
+import CreateCategory from "./CreateCategory";
+
 export default Vue.extend({
   name: "management",
   data: () => ({
-    categories: null,
+    categories: null
   }),
-  beforeMount(){
-    Category.api().get('categories').then(({ response }) => {
-      this.categories = response.data
-    })
+  beforeMount() {
+    this.refresh()
+  },
+  methods: {
+    refresh() {
+      Category.api()
+        .get("categories")
+        .then(({ response }) => {
+          this.categories = response.data;
+        });
+    }
+  },
+  components: {
+    CreateCategory
   }
 });
 </script>
