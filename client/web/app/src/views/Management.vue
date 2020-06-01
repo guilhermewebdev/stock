@@ -8,23 +8,18 @@
           <v-spacer></v-spacer>
 
           <v-btn icon>
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
+          <v-btn icon>
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
         </v-toolbar>
         <v-list class="flex-grow-1 h-100">
-          <template v-for="(item, index) in items">
-            <v-subheader v-if="item.header" :key="item.header" v-text="item.header"></v-subheader>
-
-            <v-divider v-else-if="item.divider" :key="index" :inset="item.inset"></v-divider>
-
-            <v-list-item v-else :key="item.title">
-              <v-list-item-avatar>
-                <v-img :src="item.avatar"></v-img>
-              </v-list-item-avatar>
-
+          <template v-for="(item) in categories">
+            <v-list-item :to='`/management/cat/${item.pk}/`' :key="item.pk">
               <v-list-item-content>
-                <v-list-item-title v-html="item.title"></v-list-item-title>
-                <v-list-item-subtitle v-html="item.subtitle"></v-list-item-subtitle>
+                <v-list-item-title v-html="item.name"></v-list-item-title>
+                <v-list-item-subtitle v-html="`Quantidade disponível: ${item.amount}`"></v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
           </template>
@@ -37,10 +32,16 @@
 <script lang="ts">
 import Vue from "vue";
 import app from "@/sdk";
+import { Category } from "../models";
 export default Vue.extend({
   name: "management",
   data: () => ({
-    items: 1
-  })
+    categories: null,
+  }),
+  beforeMount(){
+    Category.api().get('categories').then(({ response }) => {
+      this.categories = response.data
+    })
+  }
 });
 </script>

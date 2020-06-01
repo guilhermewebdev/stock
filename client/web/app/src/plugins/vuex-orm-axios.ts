@@ -1,5 +1,6 @@
 import { Model } from '@vuex-orm/core';
+import connect from '@/connect';
 
-export default ({ $axios }) => {
-      Model.setAxios($axios);
+export default () => {
+      Model.setAxios(connect);
 }
