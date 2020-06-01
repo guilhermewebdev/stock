@@ -31,8 +31,8 @@
         v-show="loading"
       ></v-progress-linear>
     </v-app-bar>
+    <navigation v-if="authenticated"></navigation>
     <v-content style="heigth:100%;">
-      <navigation v-if="authenticated"></navigation>
       <router-view></router-view>
     </v-content>
   </v-app>
