@@ -1,7 +1,7 @@
 <template>
   <v-container fluid class="py-0 justify-start align-stretch fill-height d-flex">
     <v-row class="h-100" justify="start" align="stretch">
-      <v-card tile class="col-md-4 px-0 d-flex flex-column py-0">
+      <v-card tile class="col-md-3 px-0 d-flex flex-column py-0">
         <v-toolbar class="w-100 flex-grow-0" tile dense>
           <v-toolbar-title>Categorias</v-toolbar-title>
 
@@ -19,9 +19,11 @@
               <v-list-item-content>
                 <v-list-item-title v-html="item.name"></v-list-item-title>
                 <v-list-item-subtitle>
-                  Quantidade disponível: {{item.amount}}
+                  <span>
+                    <span>Disponível: {{item.amount}}</span>
+                    <span class="ml-5">Mínimo: {{item.minimum}}</span>
+                  </span>
                   <v-spacer />
-                  Mínimo: {{item.minimum}}
                 </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>

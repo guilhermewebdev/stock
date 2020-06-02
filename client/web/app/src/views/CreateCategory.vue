@@ -5,7 +5,10 @@
         <v-icon>mdi-plus</v-icon>
       </v-btn>
     </template>
-    <v-form ref="form">
+    <v-form
+      @keypress.native.enter="submit"
+      ref="form"
+    >
       <v-card>
         <v-card-title>
           <span class="headline">Nova Categoria</span>
@@ -28,8 +31,9 @@
                   label="Referência *"
                   hint="Informe uma identificação única para esta categoria"
                   persistent-hint
-                  :rules="[v => errors.reference, rules.required]"
+                  :rules="[v => errors.reference, rules.required, v => v.length <= 4 || 'Máximo de 4 caractéres']"
                   required
+                  counter='4'
                   v-model="form.reference"
                 ></v-text-field>
               </v-col>
@@ -101,6 +105,11 @@ export default Vue.extend({
               this.errors[index] = response.data[index][0];
             }
             this.$refs.form.validate();
+            this.errors = {
+              name: true,
+              reference: true,
+              minimum: true
+            };
           });
       }
     }
