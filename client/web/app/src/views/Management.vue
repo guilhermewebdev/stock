@@ -15,9 +15,14 @@
         <v-list class="flex-grow-1 h-100">
           <template v-for="(item) in categories">
             <v-list-item :to="`/management/cat/${item.pk}/`" :key="item.pk">
+              <v-list-item-avatar>{{ item.reference }}</v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title v-html="item.name"></v-list-item-title>
-                <v-list-item-subtitle v-html="`Quantidade disponível: ${item.amount}`"></v-list-item-subtitle>
+                <v-list-item-subtitle>
+                  Quantidade disponível: {{item.amount}}
+                  <v-spacer />
+                  Mínimo: {{item.minimum}}
+                </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
           </template>
@@ -39,7 +44,7 @@ export default Vue.extend({
     categories: null
   }),
   beforeMount() {
-    this.refresh()
+    this.refresh();
   },
   methods: {
     refresh() {

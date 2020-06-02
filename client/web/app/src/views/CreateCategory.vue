@@ -5,9 +5,7 @@
         <v-icon>mdi-plus</v-icon>
       </v-btn>
     </template>
-    <v-form
-        ref="form"
-    >
+    <v-form ref="form">
       <v-card>
         <v-card-title>
           <span class="headline">Nova Categoria</span>
@@ -18,32 +16,35 @@
               <v-col cols="12" sm="12" md="12">
                 <v-text-field
                   label="Nome *"
-                  :hint="!!errors.name ? erros.name : 'Informe o nome da categoria'"
+                  hint="Informe o nome da categoria"
                   persistent-hint
                   required
-                  :error='!!errors.name'
+                  :rules="[v => errors.name, rules.required]"
                   v-model="form.name"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-text-field
                   label="Referência *"
-                  :hint="errros.reference ? errors.reference : 'Informe uma identificação única para esta categoria'"
+                  hint="Informe uma identificação única para esta categoria"
                   persistent-hint
+                  :rules="[v => errors.reference, rules.required]"
                   required
-                  :error='!!errors.reference'
                   v-model="form.reference"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-text-field
                   label="Quantidade mínima *"
-                  :hint="errors.minumum ? errors.minimum : 'Informe a quantidade mínima de estoque'"
+                  hint="Informe a quantidade mínima de estoque"
                   persistent-hint
                   required
                   type="number"
                   min="0"
-                  :error='!!errors.minimum'
+                  :rules="[
+                    v => errors.minimum,
+                    rules.required,
+                  ]"
                   v-model="form.minimum"
                 ></v-text-field>
               </v-col>
@@ -52,9 +53,10 @@
           <small>* Indica campos obrigatórios</small>
         </v-card-text>
         <v-card-actions>
+          <v-btn color="blue darken-1" text @click="reset">Limpar</v-btn>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="dialog = false">Close</v-btn>
-          <v-btn color="blue darken-1" text @click="submit">Save</v-btn>
+          <v-btn color="blue darken-1" text @click="dialog = false">Fechar</v-btn>
+          <v-btn color="blue darken-1" text @click="submit">Salvar</v-btn>
         </v-card-actions>
       </v-card>
     </v-form>
@@ -74,22 +76,33 @@ export default Vue.extend({
       minimum: 0
     },
     errors: {
-        name: null,
-        reference: null,
-        minimum: null,
+      name: true,
+      reference: true,
+      minimum: true
+    },
+    rules: {
+      required: v => !!v || "Este campo é obrigatório"
     }
   }),
   methods: {
+    async reset() {
+      this.$refs.form.reset();
+    },
     async submit() {
-      Category.api()
-        .post("/categories/", this.form)
-        .then(({ response }) => {
+      if (this.$refs.form.validate()) {
+        Category.api()
+          .post("/categories/", this.form)
+          .then(({ response }) => {
             this.$refs.form.reset();
-            this.$emit('created', response);
-        })
-        // .catch(({ response }) => {
-            
-        // });
+            this.$emit("created", response.data);
+          })
+          .catch(({ response }) => {
+            for (let index in response.data) {
+              this.errors[index] = response.data[index][0];
+            }
+            this.$refs.form.validate();
+          });
+      }
     }
   }
 });

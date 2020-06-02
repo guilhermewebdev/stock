@@ -31,7 +31,7 @@ const routes = [
   },
   {
     path: "/management/cat/:pk/",
-    name: "management",
+    name: "category",
     component: () => import("@/views/Management.vue"),
   },
 ];
