@@ -57,10 +57,10 @@
           <small>* Indica campos obrigatórios</small>
         </v-card-text>
         <v-card-actions>
-          <v-btn color="blue darken-1" text @click="reset">Limpar</v-btn>
+          <v-btn color="primary" text @click="reset">Limpar</v-btn>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="dialog = false">Fechar</v-btn>
-          <v-btn color="blue darken-1" text @click="submit">Salvar</v-btn>
+          <v-btn color="primary" text @click="dialog = false">Fechar</v-btn>
+          <v-btn color="primary" @click="submit">Salvar</v-btn>
         </v-card-actions>
       </v-card>
     </v-form>

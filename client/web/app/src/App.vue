@@ -1,10 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
+    <v-app-bar app color="primary" dark>
       <a to="/" class="d-flex align-center">
         <v-img
           alt="Vuetify Logo"
@@ -22,47 +18,45 @@
           src="https://caio.odo.br/static/imagens/logo/logo-maior-1080_Kq4TX1E.png"
           width="150"
         />
-      </a>      
-      <v-progress-linear
-        indeterminate
-        color="#ADFF2F"
-        bottom
-        fixed
-        v-show="loading"
-      ></v-progress-linear>
+      </a>
+      <v-progress-linear indeterminate color="#ADFF2F" bottom fixed v-show="loading"></v-progress-linear>
     </v-app-bar>
     <navigation v-if="authenticated"></navigation>
-    <v-content style="heigth:100%;">
+    <v-content v-resize="resize" :style="`height: ${height}px;`">
       <router-view></router-view>
     </v-content>
   </v-app>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import Navigation from '@/components/Navigation';
-
+import Vue from "vue";
+import Navigation from "@/components/Navigation";
 export default Vue.extend({
-  name: 'App',
+  name: "App",
   components: {
     Navigation
   },
   computed: {
-    loading(){
+    loading() {
       return this.$store.state.loading;
     },
-    authenticated(){
+    authenticated() {
       return this.$store.state.isAuthenticated;
     }
   },
   data: () => ({
-    //
+    height: window.innerHeight - 64
   }),
-  mounted(){
-    if(!this.$store.state.isAuthenticated) this.$router.push('/')
+  mounted() {
+    if (!this.$store.state.isAuthenticated) this.$router.push("/");
   },
-  beforeUpdate(){
-    if(!this.$store.state.isAuthenticated) this.$router.push('/')
+  beforeUpdate() {
+    if (!this.$store.state.isAuthenticated) this.$router.push("/");
+  },
+  methods: {
+    resize() {
+      this.height = window.innerHeight - 64;
+    }
   }
 });
 </script>

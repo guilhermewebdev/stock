@@ -1,10 +1,10 @@
 <template>
-  <v-container fluid class="py-0 h-100">
-    <v-row class="h-100" justify="start" align="stretch">
+  <v-container fluid v-resize="resize" :style="`height: ${height}px;`" class="py-0">
+    <v-row class="h-100" justify="start" align="stretch" :style="`height: ${height}px;`">
       <v-card
         tile
         class="col-md-3 h-100 px-0 d-flex position-relative flex-column py-0"
-        style="overflow: auto;"
+        :style="`height: ${height}px;`"
       >
         <v-toolbar class="w-100 flex-grow-0" tile dense>
           <v-toolbar-title>Categorias</v-toolbar-title>
@@ -22,9 +22,10 @@
               <v-list-item-avatar>
                 <v-progress-circular
                   :size="40"
-                  :value="(item.amount/item.minimum)*100"
-                  :color="(item.amount/item.minimum)*100 === 0 ?
-                   'error' : (item.amount/item.minimum)*100 < 20 ?
+                  :rotate="270"
+                  :value="(item.amount/item.minimum)*50"
+                  :color="item.amount === 0 ?
+                   'error' : item.amount < item.minimum ?
                     'warning' : 'success'"
                 >{{ item.reference }}</v-progress-circular>
               </v-list-item-avatar>
@@ -55,7 +56,8 @@ import CreateCategory from "./CreateCategory";
 export default Vue.extend({
   name: "management",
   data: () => ({
-    categories: null
+    categories: null,
+    height: window.innerHeight - 48,
   }),
   beforeMount() {
     this.refresh();
@@ -67,6 +69,9 @@ export default Vue.extend({
         .then(({ response }) => {
           this.categories = response.data;
         });
+    },
+    resize(){
+      this.height = window.innerHeight - 60
     }
   },
   components: {
