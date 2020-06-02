@@ -1,7 +1,11 @@
 <template>
-  <v-container fluid class="py-0 justify-start align-stretch fill-height d-flex">
+  <v-container fluid class="py-0 h-100">
     <v-row class="h-100" justify="start" align="stretch">
-      <v-card tile class="col-md-3 px-0 d-flex flex-column py-0">
+      <v-card
+        tile
+        class="col-md-3 h-100 px-0 d-flex position-relative flex-column py-0"
+        style="overflow: auto;"
+      >
         <v-toolbar class="w-100 flex-grow-0" tile dense>
           <v-toolbar-title>Categorias</v-toolbar-title>
 
@@ -12,10 +16,18 @@
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
         </v-toolbar>
-        <v-list class="flex-grow-1 h-100">
+        <v-list class="flex-grow-1" style="overflow: auto;">
           <template v-for="(item) in categories">
             <v-list-item :to="`/management/cat/${item.pk}/`" :key="item.pk">
-              <v-list-item-avatar>{{ item.reference }}</v-list-item-avatar>
+              <v-list-item-avatar>
+                <v-progress-circular
+                  :size="40"
+                  :value="(item.amount/item.minimum)*100"
+                  :color="(item.amount/item.minimum)*100 === 0 ?
+                   'error' : (item.amount/item.minimum)*100 < 20 ?
+                    'warning' : 'success'"
+                >{{ item.reference }}</v-progress-circular>
+              </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title v-html="item.name"></v-list-item-title>
                 <v-list-item-subtitle>
