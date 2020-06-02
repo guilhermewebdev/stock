@@ -43,6 +43,37 @@
           </template>
         </v-list>
       </v-card>
+      <v-col md="9">
+        <v-expansion-panels focusable v-if="$route.params.pk" hover tile>
+          <v-expansion-panel>
+            <v-expansion-panel-header>{{ selected.name }}</v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-progress-linear
+                :color="selected.amount === 0 ?
+                   'error' : selected.amount < selected.minimum ?
+                    'warning' : 'success'"
+                :value="(selected.amount/selected.minimum)*50"
+              ></v-progress-linear>
+              
+              <v-row justify="space-between" dense>
+                <v-col cols="3">
+                  <span>Quantidade Disponível:</span>
+                  <span>{{ selected.amount }}</span>
+                </v-col>
+                <v-col cols="3">
+                  <span>Quantidade Mínima:</span>
+                  <span>{{ selected.minimum }}</span>
+                </v-col>
+                <v-col cols="3">
+                  <span>Data de Cadastro:</span>
+                  <span>{{ new Date(selected.registration).toLocaleString('pt-BR', { timeZone: 'UTC' }) }}</span>
+                </v-col>
+              </v-row>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
+        
+      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -57,10 +88,17 @@ export default Vue.extend({
   name: "management",
   data: () => ({
     categories: null,
-    height: window.innerHeight - 48,
+    height: window.innerHeight - 48
   }),
   beforeMount() {
     this.refresh();
+  },
+  computed: {
+    selected() {
+      return this.categories.filter(
+        item => item.pk == this.$route.params.pk
+      )[0];
+    }
   },
   methods: {
     refresh() {
@@ -70,8 +108,8 @@ export default Vue.extend({
           this.categories = response.data;
         });
     },
-    resize(){
-      this.height = window.innerHeight - 60
+    resize() {
+      this.height = window.innerHeight - 60;
     }
   },
   components: {
