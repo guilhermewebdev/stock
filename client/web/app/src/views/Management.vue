@@ -74,7 +74,8 @@
             { text: 'Marca', value: 'brand' },
             { text: 'Quantidade', value: 'amount', align: 'center' },
             { text: 'Data do cadastro', value: 'registration', align: 'center' },
-            { text: 'Código', value: 'bar_code' }
+            { text: 'Código', value: 'bar_code' },
+            { text: 'Ações', value: 'actions', sortable: false }
           ]"
           :items="selected.products.map((item) => {
             return {
@@ -104,6 +105,10 @@
                 </v-col>
               </v-row>
             </v-container>
+          </template>
+          <template v-slot:item.actions="{ item }">
+            <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
+            <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
           </template>
         </v-data-table>
       </v-col>

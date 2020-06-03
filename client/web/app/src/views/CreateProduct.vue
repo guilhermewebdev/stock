@@ -7,7 +7,7 @@
       <v-card-title>
         <span class="headline">Novo Produto</span>
       </v-card-title>
-      <v-form autocomplete="off" ref="form">
+      <v-form autocomplete="off" ref="form" @keypress.native.enter="submit">
         <v-card-text>
           <v-container>
             <v-row>
@@ -42,9 +42,10 @@
           <small>* Indica campos obrigatórios</small>
         </v-card-text>
         <v-card-actions>
+          <v-btn color="primary" text @click="$refs.form.reset()">Limpar</v-btn>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="dialog = false">Close</v-btn>
-          <v-btn color="blue darken-1" text @click="submit">Save</v-btn>
+          <v-btn color="primary" text @click="dialog = false">Fechar</v-btn>
+          <v-btn color="primary" @click="submit">Salvar</v-btn>
         </v-card-actions>
       </v-form>
     </v-card>
@@ -85,7 +86,7 @@ export default Vue.extend({
           .catch(({ response }) => {
             if (response) {
               for (let index in response.data) {
-                this.errors[index] = response.data[index][0];
+                this.$data.errors[index] = response.data[index][0];
               }
               this.$refs.form.validate();
               this.errors = {
