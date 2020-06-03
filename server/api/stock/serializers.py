@@ -124,20 +124,6 @@ class PurchaseSerializer(serializers.ModelSerializer):
 #############               Removals            ##################
 ################################################################## 
 
-class ConsumerSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = models.Consumer
-        fields = [
-            'pk',
-            'type',
-            'consumer',
-        ]
-        read_only_fields = [
-            'pk',
-            'user',
-        ]
-
 class ComsumRequestSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(
         queryset=models.Category.objects.all(),
@@ -175,11 +161,7 @@ class RequestSerializer(serializers.ModelSerializer):
         label=_('Produtos'),
         required=True,
     )
-    consumer = serializers.PrimaryKeyRelatedField(
-        queryset=models.Consumer.objects.none(),
-        label=_('Consumidor'),
-        required=True,
-    )
+    
 
     def create(self, validated_data):
         user = self.context['request'].user
@@ -207,6 +189,7 @@ class RequestSerializer(serializers.ModelSerializer):
             'note',
             'user',
             'consumer',
+            'consumer_type',
         ]
         read_only_fields = [
             'pk',

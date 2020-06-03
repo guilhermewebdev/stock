@@ -34,8 +34,6 @@ api = [
     path('purchases/<int:pk>/', stock.PurchaseDetail.as_view()),
     path('removals/', stock.RemovalList.as_view()),
     path('removals/<int:pk>/', stock.RemovalDetail.as_view()),
-    path('consumers/', stock.ConsumerList.as_view()),
-    path('consumers/<int:pk>/', stock.ConsumerDetail.as_view()),
     path('deliveries/', stock.DeliveryList.as_view()),
     path('deliveries/<int:pk>/', stock.DeliveryDetail.as_view()),
 ]

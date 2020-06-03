@@ -74,15 +74,15 @@
                             <v-col cols='6'>
                                 <v-autocomplete
                                     label="Tipo de consumidor"
-                                    :rules="[rules.required]"
+                                    :rules="[rules.required, errors.consumer_type]"
                                     :items="consumers"
-                                    v-model="request.consumer.type"
+                                    v-model="request.consumer_type"
                                 ></v-autocomplete>
                             </v-col>
                             <v-col cols='6'>
                                 <v-text-field
-                                    :rules="[rules.required]"
-                                    v-model="request.consumer.consumer"
+                                    :rules="[rules.required, errors.consumer]"
+                                    v-model="request.consumer"
                                     label="Consumidor"
                                 ></v-text-field>
                             </v-col>
@@ -159,10 +159,12 @@ export default {
                     }
                 ],
                 note: '',
-                consumer: {
-                    type: '',
-                    consumer: ''
-                }
+                consumer: '',
+                consumer_type: ''
+            },
+            errors: {
+                consumer: true,
+                consumer_type: true,
             }
         }
     },
@@ -171,10 +173,7 @@ export default {
             return {
                 products: this.request.products,
                 note: this.request.note,
-                consumer: {
-                    type: this.request.consumer.type,
-                    [this.request.consumer.type]: this.request.consumer.consumer
-                }
+                ...this.request,
             }
         },
         addButton(){
@@ -219,8 +218,14 @@ export default {
             if(this.$refs.form.validate()){
                 console.log(this.form)
                 app.requests.consum.createItem(this.form)
-                    .then(() => alert('Enviado!'))
-                    .catch(err => console.log(err.response.data))
+                    .then(() => {
+                        this.$refs.form.reset()
+                    })
+                    .catch(({ response: { data }}) => {
+                        for(let index in data){
+                            this.errors[index] = data[index][0]
+                        }
+                    })
             }
         },
         async addProduct(product:number){
