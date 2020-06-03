@@ -43,8 +43,8 @@
           </template>
         </v-list>
       </v-card>
-      <v-col md="9">
-        <v-expansion-panels focusable v-if="$route.params.pk" hover tile>
+      <v-col md="9" v-if="$route.params.pk">
+        <v-expansion-panels focusable hover tile>
           <v-expansion-panel>
             <v-expansion-panel-header>{{ selected.name }}</v-expansion-panel-header>
             <v-expansion-panel-content>
@@ -54,25 +54,51 @@
                     'warning' : 'success'"
                 :value="(selected.amount/selected.minimum)*50"
               ></v-progress-linear>
-              
+
               <v-row justify="space-between" dense>
                 <v-col cols="3">
-                  <span>Quantidade Disponível:</span>
-                  <span>{{ selected.amount }}</span>
+                  <span>Quantidade Disponível: {{ selected.amount }}</span>
                 </v-col>
                 <v-col cols="3">
-                  <span>Quantidade Mínima:</span>
-                  <span>{{ selected.minimum }}</span>
+                  <span>Quantidade Mínima: {{ selected.minimum }}</span>
                 </v-col>
                 <v-col cols="3">
-                  <span>Data de Cadastro:</span>
-                  <span>{{ new Date(selected.registration).toLocaleString('pt-BR', { timeZone: 'UTC' }) }}</span>
+                  <span>Data de Cadastro: {{ new Date(selected.registration).toLocaleString('pt-BR', { timeZone: 'UTC' }) }}</span>
                 </v-col>
               </v-row>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
-        
+        <v-data-table
+          :headers="[
+            { text: 'Marca', value: 'brand' },
+            { text: 'Quantidade', value: 'amount', align: 'center' },
+            { text: 'Data do cadastro', value: 'registration', align: 'center' },
+            { text: 'Código', value: 'bar_code' }
+          ]"
+          :items="selected.products.map((item) => {
+            return {
+              ...item,
+              registration: new Date(item.registration).toLocaleString('pt-BR', { timeZone: 'UTC' })
+            };
+          })"
+          item-key="name"
+          class="elevation-1"
+          :search="searchProduct"
+          locale="pt-BR"
+          hide-default-footer
+        >
+          <template v-slot:top>
+            <v-col md="4">
+              <v-text-field
+                prepend-inner-icon="mdi-magnify"
+                clearable
+                label="Buscar"
+                v-model="searchProduct"
+              />
+            </v-col>
+          </template>
+        </v-data-table>
       </v-col>
     </v-row>
   </v-container>
@@ -88,7 +114,8 @@ export default Vue.extend({
   name: "management",
   data: () => ({
     categories: null,
-    height: window.innerHeight - 48
+    height: window.innerHeight - 48,
+    searchProduct: ""
   }),
   beforeMount() {
     this.refresh();
