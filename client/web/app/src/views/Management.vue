@@ -107,10 +107,36 @@
             </v-container>
           </template>
           <template v-slot:item.actions="{ item }">
-            <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
-            <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
+            <v-btn color="primary" icon>
+              <v-icon small @click="editDialog = true">mdi-pencil</v-icon>
+            </v-btn>
+            <v-btn color="primary" icon>
+              <v-icon small @click="dialogDelete(item)">mdi-delete</v-icon>
+            </v-btn>
           </template>
         </v-data-table>
+        <v-dialog v-model="deletionDialog" persistent max-width="290">
+          <v-card>
+            <v-card-title class="headline">Deletar Produto</v-card-title>
+            <v-card-text>Você tem certeza que deseja apagar permanentemente o produto {{ selected.name }}, da marca {{ deletionItem.brand }} com {{ deletionItem.amount }} items e o código {{ deletionItem.bar_code }}?</v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="primary" text @click="deleteProduct">Deletar</v-btn>
+              <v-btn color="primary" @click="deletionDialog = false; deletionItem = {};">Cancelar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <v-dialog v-model="editDialog" persistent max-width="290">
+          <v-card>
+            <v-card-title class="headline">Use Google's location service?</v-card-title>
+            <v-card-text>Let Google help apps determine location. This means sending anonymous location data to Google, even when no apps are running.</v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="primary" text @click="dialog = false">Disagree</v-btn>
+              <v-btn color="primary" text @click="dialog = false">Agree</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-col>
     </v-row>
   </v-container>
@@ -128,7 +154,11 @@ export default Vue.extend({
   data: () => ({
     categories: null,
     height: window.innerHeight - 48,
-    searchProduct: ""
+    searchProduct: "",
+    deletionDialog: false,
+    editDialog: false,
+    editionItem: {},
+    deletionItem: {},
   }),
   beforeMount() {
     this.refresh();
@@ -148,6 +178,16 @@ export default Vue.extend({
     },
     resize() {
       this.height = window.innerHeight - 60;
+    },
+    dialogDelete(item){
+      this.deletionItem = item;
+      this.deletionDialog = true;
+    },
+    deleteProduct(){
+      connect.delete(`/products/${this.deletionItem.pk}/`)
+      .then(this.refresh)
+      .then(() => this.deletionItem = {})
+      .then(() => this.deletionDialog = false)
     }
   },
   components: {
