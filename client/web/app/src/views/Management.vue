@@ -43,7 +43,7 @@
           </template>
         </v-list>
       </v-card>
-      <v-col md="9" v-if="$route.params.pk">
+      <v-col md="9" v-if="$route.params.cat">
         <v-expansion-panels focusable hover tile>
           <v-expansion-panel>
             <v-expansion-panel-header>{{ selected.name }}</v-expansion-panel-header>
@@ -89,14 +89,21 @@
           hide-default-footer
         >
           <template v-slot:top>
-            <v-col md="4">
-              <v-text-field
-                prepend-inner-icon="mdi-magnify"
-                clearable
-                label="Buscar"
-                v-model="searchProduct"
-              />
-            </v-col>
+            <v-container>
+              <v-row>
+                <v-col md="4">
+                  <v-text-field
+                    prepend-inner-icon="mdi-magnify"
+                    clearable
+                    label="Buscar"
+                    v-model="searchProduct"
+                  />
+                </v-col>
+                <v-col md="2" class="d-flex justify-center align-center">
+                  <create-product v-on:created="refresh" />
+                </v-col>
+              </v-row>
+            </v-container>
           </template>
         </v-data-table>
       </v-col>
@@ -107,8 +114,9 @@
 <script lang="ts">
 import Vue from "vue";
 import app from "@/sdk";
-import { Category } from "../models";
-import CreateCategory from "./CreateCategory";
+import CreateCategory from "./CreateCategory.vue";
+import CreateProduct from "./CreateProduct.vue";
+import connect from "../connect";
 
 export default Vue.extend({
   name: "management",
@@ -123,24 +131,23 @@ export default Vue.extend({
   computed: {
     selected() {
       return this.categories.filter(
-        item => item.pk == this.$route.params.pk
+        item => item.pk == this.$route.params.cat
       )[0];
     }
   },
   methods: {
     refresh() {
-      Category.api()
-        .get("categories")
-        .then(({ response }) => {
-          this.categories = response.data;
-        });
+      connect.get("/categories/?format=json").then(({ data }) => {
+        this.categories = data;
+      });
     },
     resize() {
       this.height = window.innerHeight - 60;
     }
   },
   components: {
-    CreateCategory
+    CreateCategory,
+    CreateProduct
   }
 });
 </script>

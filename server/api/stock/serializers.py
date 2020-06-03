@@ -17,8 +17,6 @@ class ProductListSerializer(serializers.ModelSerializer):
         model = models.Product
         fields = [
             'pk',
-            'name',
-            'description',
             'brand',
             'bar_code',
             'category',
@@ -26,7 +24,8 @@ class ProductListSerializer(serializers.ModelSerializer):
             'amount',
         ]
         read_only_fields = [
-            'pk'
+            'pk',
+            'registration',
         ]
 
 class CategoryListSerializer(serializers.ModelSerializer):
@@ -50,6 +49,7 @@ class CategoryListSerializer(serializers.ModelSerializer):
             'pk',
             'name',
             'reference',
+            'description',
             'amount',
             'minimum',
             'registration',

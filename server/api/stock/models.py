@@ -27,6 +27,12 @@ class Category(models.Model):
         verbose_name=_("Data do cadasto"),
         auto_now=True,
     )
+    description = models.TextField(
+        verbose_name=_("Descrição"),
+        max_length=500,
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return self.name
@@ -40,20 +46,10 @@ class Category(models.Model):
 
 class Product(models.Model):
     objects = models.Manager()
-    name = models.CharField(
-        verbose_name=_("Nome"),
-        max_length=200,
-    )
     bar_code = models.CharField(
         verbose_name=_("Código de barras"),
         max_length=100,
         unique=True,
-    )
-    description = models.TextField(
-        verbose_name=_("Descrição"),
-        max_length=500,
-        null=True,
-        blank=True,
     )
     brand = models.CharField(
         verbose_name=_('Marca'),

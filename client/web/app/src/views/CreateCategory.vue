@@ -5,10 +5,7 @@
         <v-icon>mdi-plus</v-icon>
       </v-btn>
     </template>
-    <v-form
-      @keypress.native.enter="submit"
-      ref="form"
-    >
+    <v-form @keypress.native.enter="submit" ref="form">
       <v-card>
         <v-card-title>
           <span class="headline">Nova Categoria</span>
@@ -33,7 +30,7 @@
                   persistent-hint
                   :rules="[v => errors.reference, rules.required, v => v.length <= 4 || 'Máximo de 4 caractéres']"
                   required
-                  counter='4'
+                  counter="4"
                   v-model="form.reference"
                 ></v-text-field>
               </v-col>
@@ -68,8 +65,7 @@
 </template>
 <script lang="ts">
 import Vue from "vue";
-import { Category } from "../models";
-
+import connect from "../connect";
 export default Vue.extend({
   name: "CrateCategory",
   data: () => ({
@@ -94,13 +90,13 @@ export default Vue.extend({
     },
     async submit() {
       if (this.$refs.form.validate()) {
-        Category.api()
+        connect
           .post("/categories/", this.form)
-          .then(({ response }) => {
+          .then(response => {
             this.$refs.form.reset();
             this.$emit("created", response.data);
           })
-          .catch(({ response }) => {
+          .catch(response => {
             for (let index in response.data) {
               this.errors[index] = response.data[index][0];
             }

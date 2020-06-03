@@ -47,12 +47,12 @@ export default Vue.extend({
   data: () => ({
     height: window.innerHeight - 64
   }),
-  mounted() {
-    if (!this.$store.state.isAuthenticated) this.$router.push("/");
-  },
-  beforeUpdate() {
-    if (!this.$store.state.isAuthenticated) this.$router.push("/");
-  },
+  // mounted() {
+  //   if (!this.$store.state.isAuthenticated) this.$router.push("/");
+  // },
+  // beforeUpdate() {
+  //   if (!this.$store.state.isAuthenticated) this.$router.push("/");
+  // },
   methods: {
     resize() {
       this.height = window.innerHeight - 64;
