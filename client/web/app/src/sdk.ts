@@ -193,7 +193,9 @@ const app:CRUD|any = {
     haveItems: false,
     url: 'http://localhost/api',
     async mount(){
-        return this.sessions.checkAuth()
+        const auth = await this.sessions.checkAuth()
+        this.notifyObservers()
+        return auth;
     }
 }
 

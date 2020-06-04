@@ -2,7 +2,7 @@
     <div style="heigth:100%;">
          <v-navigation-drawer
           permanent
-          absolute
+          app
           expand-on-hover
           mini-variant
         >

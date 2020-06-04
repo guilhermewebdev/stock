@@ -1,3 +1,4 @@
+import connect from '@/connect';
 import Vue from 'vue'
 import Vuex from 'vuex'
 import app from '@/sdk'
@@ -27,5 +28,5 @@ export default new Vuex.Store({
     }
   },
   modules: {
-  }
+  },
 })

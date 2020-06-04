@@ -56,14 +56,6 @@ class CategoryDetail(DetailView):
     model = models.Category
     serializer_class = serializers.CategoryListSerializer
 
-class ConsumerList(ListView):
-    model = models.Consumer
-    serializer_class = serializers.ConsumerSerializer
-
-class ConsumerDetail(DetailView):
-    model = models.Consumer
-    serializer_class = serializers.ConsumerSerializer
-
 class ConsumptionRequestList(ListView):
     model = models.ConsumptionRequest
     serializer_class = serializers.RequestSerializer

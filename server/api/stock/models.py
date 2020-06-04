@@ -1,13 +1,15 @@
 from django.db import models
-from django.utils.translation import gettext as _ 
+from django.utils.translation import gettext as _
 from django.contrib.auth.admin import User
 from django.core.exceptions import ValidationError
+
 
 def validator_amount(value):
     if value < 0:
         raise ValidationError(
             _('Não é possível existir um valor negativo')
-        ) 
+        )
+
 
 class Category(models.Model):
     objects = models.Manager()
@@ -27,10 +29,16 @@ class Category(models.Model):
         verbose_name=_("Data do cadasto"),
         auto_now=True,
     )
+    description = models.TextField(
+        verbose_name=_("Descrição"),
+        max_length=500,
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return self.name
-    
+
     def amount(self):
         products = list(self.products.values('amount'))
         amount = 0
@@ -38,22 +46,13 @@ class Category(models.Model):
             amount += product['amount']
         return amount
 
+
 class Product(models.Model):
     objects = models.Manager()
-    name = models.CharField(
-        verbose_name=_("Nome"),
-        max_length=200,
-    )
     bar_code = models.CharField(
         verbose_name=_("Código de barras"),
         max_length=100,
         unique=True,
-    )
-    description = models.TextField(
-        verbose_name=_("Descrição"),
-        max_length=500,
-        null=True,
-        blank=True,
     )
     brand = models.CharField(
         verbose_name=_('Marca'),
@@ -81,6 +80,7 @@ class Product(models.Model):
 ##################################################################
 #############               Additions            #################
 ##################################################################
+
 
 class Addition(models.Model):
     objects = models.Manager()
@@ -130,7 +130,8 @@ class Addition(models.Model):
 
     def save(self, *args, **kwargs):
         self.__add()
-        return super(Addition, self).save(*args, **kwargs)        
+        return super(Addition, self).save(*args, **kwargs)
+
 
 class Purchase(models.Model):
     objects = models.Manager()
@@ -176,14 +177,14 @@ class Purchase(models.Model):
 
 ##################################################################
 #############               Removals            ##################
-##################################################################   
+##################################################################
 
 class Removal(models.Model):
     objects = models.Manager()
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
-        related_name='removals',        
+        related_name='removals',
     )
     amount = models.IntegerField(
         verbose_name=_('Retiradas'),
@@ -198,7 +199,7 @@ class Removal(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.DO_NOTHING,
-        related_name='removals',        
+        related_name='removals',
     )
 
     def __str__(self):
@@ -217,7 +218,9 @@ class Removal(models.Model):
         self.product.save(update_fields=['amount'])
         return super(Removal, self).save(*args, **kwargs)
 
-class Consumer(models.Model):
+
+
+class ConsumptionRequest(models.Model):
     TYPES = (
         ('user', _('Usuário')),
         ('dentist', _('Dentista')),
@@ -225,41 +228,25 @@ class Consumer(models.Model):
         ('patient', _('Paciente')),
         ('other', _('Outro')),
     )
-    type = models.CharField(
-        verbose_name=_('Tipo de consumidor'),
-        max_length=100,
-        choices=TYPES
-    )
     objects = models.Manager()
-    consumer = models.CharField(
-        verbose_name=_('Consumidor'),
-        max_length=200,
-    )
-    registration = models.DateTimeField(
-        verbose_name=_("Data do cadasto"),
-        auto_now=True,
-    )
-
-    def __str__(self):
-        return '%s: %s' % (self.type, dir(self)[self.type])
-
-
-class ConsumptionRequest(models.Model):
-    objects = models.Manager()    
     user = models.ForeignKey(
         User,
         on_delete=models.DO_NOTHING,
         related_name='requests',
     )
-    consumer = models.ForeignKey(
-        Consumer,
-        on_delete=models.DO_NOTHING,
-        related_name='requests'
+    consumer = models.CharField(
+        verbose_name=_('Consumidor'),
+        max_length=200,
+    )
+    consumer_type = models.CharField(
+        verbose_name=_('Tipo de consumidor'),
+        max_length=100,
+        choices=TYPES
     )
     registration = models.DateTimeField(
         verbose_name=_('Data da requisição'),
         auto_now=True,
-    )    
+    )
     note = models.CharField(
         verbose_name=_('Observação'),
         max_length=300,
@@ -268,9 +255,8 @@ class ConsumptionRequest(models.Model):
     )
 
 
-
 class ProductComsuptionRequest(models.Model):
-    objects = models.Manager()    
+    objects = models.Manager()
     product = models.ForeignKey(
         Category,
         on_delete=models.DO_NOTHING,
@@ -293,6 +279,7 @@ class ProductComsuptionRequest(models.Model):
             self.product,
             self.amount
         )
+
 
 class Delivery(models.Model):
     objects = models.Manager()
@@ -319,7 +306,7 @@ class Delivery(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.DO_NOTHING,
-        related_name='deliveries',        
+        related_name='deliveries',
     )
 
     def __str__(self):
@@ -333,7 +320,7 @@ class Delivery(models.Model):
         removal = Removal(
             product=self.product,
             amount=self.amount,
-            user=self.user,       
+            user=self.user,
         )
         removal.save()
 
