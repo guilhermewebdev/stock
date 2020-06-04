@@ -5,7 +5,7 @@
         <v-icon>mdi-plus</v-icon>
       </v-btn>
     </template>
-    <v-form @keypress.native.enter="submit" ref="form">
+    <v-form @keypress.native.enter="submit" autocomplete='off' ref="form">
       <v-card>
         <v-card-title>
           <span class="headline">Nova Categoria</span>

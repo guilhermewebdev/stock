@@ -22,8 +22,8 @@
       <v-progress-linear indeterminate color="#ADFF2F" bottom fixed v-show="loading"></v-progress-linear>
     </v-app-bar>
     <navigation v-if="authenticated"></navigation>
-    <v-content v-resize="resize" :style="`height: ${height}px;`">
-      <router-view></router-view>
+    <v-content v-resize="resize" style="height: calc(100vh - 64px);">
+      <router-view style="height: 100%"></router-view>
     </v-content>
   </v-app>
 </template>

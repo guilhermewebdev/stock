@@ -1,10 +1,10 @@
 <template>
-  <v-container fluid v-resize="resize" :style="`height: ${height}px;`" class="py-0">
-    <v-row class="h-100" justify="start" align="stretch" :style="`height: ${height}px;`">
+  <v-container fluid v-resize="resize" style="height: calc(100vh - 60px);" class="py-0">
+    <v-row class="h-100" justify="start" align="stretch" style="height: calc(100vh - 60px);">
       <v-card
         tile
         class="col-md-3 h-100 px-0 d-flex position-relative flex-column py-0"
-        :style="`height: ${height}px;`"
+        style="height: calc(100vh - 60px);"
       >
         <v-toolbar class="w-100 flex-grow-0" tile dense>
           <v-toolbar-title>Categorias</v-toolbar-title>
@@ -16,7 +16,7 @@
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
         </v-toolbar>
-        <v-list class="flex-grow-1" style="overflow: auto;">
+        <v-list class="flex-grow-1 overflow-y-auto">
           <template v-for="(item) in categories">
             <v-list-item :to="`/management/cat/${item.pk}/`" :key="item.pk">
               <v-list-item-avatar>
@@ -43,8 +43,13 @@
           </template>
         </v-list>
       </v-card>
-      <v-col md="9" v-if="$route.params.cat">
-        <v-expansion-panels focusable hover tile>
+      <v-col
+        md="9"
+        class="px-0 py-0 d-flex position-relative h-100 flex-column"
+        style="height: calc(100vh - 60px);"
+        v-if="$route.params.cat"
+      >
+        <v-expansion-panels class="flex-grow-0 w-100" focusable hover tile>
           <v-expansion-panel>
             <v-expansion-panel-header>{{ selected.name }}</v-expansion-panel-header>
             <v-expansion-panel-content>
@@ -69,52 +74,54 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
-        <v-data-table
-          :headers="[
-            { text: 'Marca', value: 'brand' },
-            { text: 'Quantidade', value: 'amount', align: 'center' },
-            { text: 'Data do cadastro', value: 'registration', align: 'center' },
-            { text: 'Código', value: 'bar_code' },
-            { text: 'Ações', value: 'actions', sortable: false }
-          ]"
-          :items="selected.products.map((item) => {
+        <v-flex class="overflow-y-auto">
+          <v-data-table
+            :headers="[
+              { text: 'Marca', value: 'brand' },
+              { text: 'Quantidade', value: 'amount', align: 'center' },
+              { text: 'Data do cadastro', value: 'registration', align: 'center' },
+              { text: 'Código', value: 'bar_code' },
+              { text: 'Ações', value: 'actions', sortable: false }
+            ]"
+            :items="selected.products.map((item) => {
             return {
               ...item,
               registration: new Date(item.registration).toLocaleString('pt-BR', { timeZone: 'UTC' })
             };
           })"
-          item-key="name"
-          class="elevation-1"
-          :search="searchProduct"
-          locale="pt-BR"
-          hide-default-footer
-        >
-          <template v-slot:top>
-            <v-container>
-              <v-row>
-                <v-col md="4">
-                  <v-text-field
-                    prepend-inner-icon="mdi-magnify"
-                    clearable
-                    label="Buscar"
-                    v-model="searchProduct"
-                  />
-                </v-col>
-                <v-col md="2" class="d-flex justify-center align-center">
-                  <create-product v-on:created="refresh" />
-                </v-col>
-              </v-row>
-            </v-container>
-          </template>
-          <template v-slot:item.actions="{ item }">
-            <v-btn color="primary" icon>
-              <v-icon small @click="editDialog = true">mdi-pencil</v-icon>
-            </v-btn>
-            <v-btn color="primary" icon>
-              <v-icon small @click="dialogDelete(item)">mdi-delete</v-icon>
-            </v-btn>
-          </template>
-        </v-data-table>
+            item-key="name"
+            class="flex-grow-1 overflow-y-auto d-flex flex-column position-relative"
+            :search="searchProduct"
+            locale="pt-BR"
+          >
+            <template v-slot:top>
+              <v-container class="flex-grow-0">
+                <v-row>
+                  <v-col md="4">
+                    <v-text-field
+                      prepend-inner-icon="mdi-magnify"
+                      clearable
+                      label="Buscar"
+                      autocomplete="off"
+                      v-model="searchProduct"
+                    />
+                  </v-col>
+                  <v-col md="2" class="d-flex justify-center align-center">
+                    <create-product v-on:created="refresh" />
+                  </v-col>
+                </v-row>
+              </v-container>
+            </template>
+            <template v-slot:item.actions="{ item }">
+              <v-btn color="primary" icon>
+                <v-icon small @click="editDialog = true">mdi-pencil</v-icon>
+              </v-btn>
+              <v-btn color="primary" icon>
+                <v-icon small @click="dialogDelete(item)">mdi-delete</v-icon>
+              </v-btn>
+            </template>
+          </v-data-table>
+        </v-flex>
         <v-dialog v-model="deletionDialog" persistent max-width="290">
           <v-card>
             <v-card-title class="headline">Deletar Produto</v-card-title>
@@ -158,7 +165,7 @@ export default Vue.extend({
     deletionDialog: false,
     editDialog: false,
     editionItem: {},
-    deletionItem: {},
+    deletionItem: {}
   }),
   beforeMount() {
     this.refresh();
@@ -179,15 +186,16 @@ export default Vue.extend({
     resize() {
       this.height = window.innerHeight - 60;
     },
-    dialogDelete(item){
+    dialogDelete(item) {
       this.deletionItem = item;
       this.deletionDialog = true;
     },
-    deleteProduct(){
-      connect.delete(`/products/${this.deletionItem.pk}/`)
-      .then(this.refresh)
-      .then(() => this.deletionItem = {})
-      .then(() => this.deletionDialog = false)
+    deleteProduct() {
+      connect
+        .delete(`/products/${this.deletionItem.pk}/`)
+        .then(this.refresh)
+        .then(() => (this.deletionItem = {}))
+        .then(() => (this.deletionDialog = false));
     }
   },
   components: {

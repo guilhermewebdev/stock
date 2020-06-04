@@ -60,7 +60,6 @@ export default Vue.extend({
   data: vm => ({
     dialog: false,
     form: {
-      category: vm.$route.params.cat,
       brand: null,
       amount: null,
       bar_code: null
@@ -78,10 +77,13 @@ export default Vue.extend({
     async submit() {
       if (this.$refs.form.validate()) {
         connect
-          .post("/products/?format=json", this.$data.form)
-          .then(response => {
+          .post("/products/?format=json", {
+            category: this.$route.params.cat,
+            ...this.$data.form
+          })
+          .then(({ data }) => {
+            this.$emit("created", data);
             this.$refs.form.reset();
-            this.$emit("created", response);
           })
           .catch(({ response }) => {
             if (response) {
