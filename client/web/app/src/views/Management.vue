@@ -71,6 +71,28 @@
                   <span>Data de Cadastro: {{ new Date(selected.registration).toLocaleString('pt-BR', { timeZone: 'UTC' }) }}</span>
                 </v-col>
               </v-row>
+              <v-row justify="end">
+                <v-col md="2" class="d-flex justify-end">
+                  <v-dialog v-model="deletionCatDialog" persistent max-width="290">
+                    <template v-slot:activator="{ on }">
+                      <v-btn v-on="on" text>Deletar</v-btn>
+                    </template>
+                    <v-card>
+                      <v-card-title class="headline">Deletar {{ selected.name }}</v-card-title>
+                      <v-card-text>Você tem certeza que deseja apagar permanentemente a categoria {{ selected.name }}, com {{ selected.amount }} items?</v-card-text>
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="primary" text @click="deleteCategory">Deletar</v-btn>
+                        <v-btn
+                          color="primary"
+                          text
+                          @click="deletionCatDialog = false;"
+                        >Cancelar</v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+                </v-col>
+              </v-row>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
@@ -127,7 +149,11 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="primary" text @click="deleteProduct">Deletar</v-btn>
-              <v-btn color="primary" text @click="deletionDialog = false; deletionItem = {};">Cancelar</v-btn>
+              <v-btn
+                color="primary"
+                text
+                @click="deletionDialog = false; deletionItem = {};"
+              >Cancelar</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -161,6 +187,7 @@ export default Vue.extend({
     height: window.innerHeight - 48,
     searchProduct: "",
     deletionDialog: false,
+    deletionCatDialog: false,
     editDialog: false,
     editionItem: {},
     deletionItem: {}
@@ -195,6 +222,11 @@ export default Vue.extend({
         .then(() => (this.deletionItem = {}))
         .then(() => (this.deletionDialog = false));
     },
+    deleteCategory(){
+      connect.delete(`/categories/${this.selected.pk}/`)
+      .then(this.refresh)
+      .then(() => this.$router.push('/management/'))
+    }
   },
   components: {
     CreateCategory,

@@ -259,7 +259,7 @@ class ProductComsuptionRequest(models.Model):
     objects = models.Manager()
     product = models.ForeignKey(
         Category,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.CASCADE,
         related_name='requests'
     )
     amount = models.IntegerField(
