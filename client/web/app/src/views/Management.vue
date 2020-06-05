@@ -113,10 +113,8 @@
               </v-container>
             </template>
             <template v-slot:item.actions="{ item }">
-              <v-btn color="primary" icon>
-                <v-icon small @click="editDialog = true">mdi-pencil</v-icon>
-              </v-btn>
-              <v-btn color="primary" icon>
+              <create-product :key="item.pk" toUpdate @created="refresh" :product="item" />
+              <v-btn :key="item.pk" color="primary" icon>
                 <v-icon small @click="dialogDelete(item)">mdi-delete</v-icon>
               </v-btn>
             </template>
@@ -129,7 +127,7 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="primary" text @click="deleteProduct">Deletar</v-btn>
-              <v-btn color="primary" @click="deletionDialog = false; deletionItem = {};">Cancelar</v-btn>
+              <v-btn color="primary" text @click="deletionDialog = false; deletionItem = {};">Cancelar</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -196,7 +194,7 @@ export default Vue.extend({
         .then(this.refresh)
         .then(() => (this.deletionItem = {}))
         .then(() => (this.deletionDialog = false));
-    }
+    },
   },
   components: {
     CreateCategory,
