@@ -131,6 +131,11 @@ class ComsumRequestSerializer(serializers.ModelSerializer):
         label=_('Produto')
     )
 
+    def __init__(self, get, *args, **kwargs):
+        super(ComsumRequestSerializer, self).__init__(get, *args, **kwargs)
+        if(get):
+            self.fields['product'] = CategoryListSerializer()
+
     class Meta:
         model = models.ProductComsuptionRequest
         fields = [
@@ -156,12 +161,16 @@ class RequestSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
         read_only=True,
     )
-    products = ComsumRequestSerializer(
-        many=True,
-        label=_('Produtos'),
-        required=True,
-    )
-    
+
+    def __init__(self, *args, **kwargs):
+        super(RequestSerializer, self).__init__(*args, **kwargs)
+        self.fields['products'] = ComsumRequestSerializer(
+            many=True,
+            label=_('Produtos'),
+            required=True,
+            get=(self.context['request'].method == 'GET') if 'request' in self.context else False
+        )
+
 
     def create(self, validated_data):
         user = self.context['request'].user
