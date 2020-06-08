@@ -83,14 +83,11 @@
                       <v-card-actions>
                         <v-spacer></v-spacer>
                         <v-btn color="primary" text @click="deleteCategory">Deletar</v-btn>
-                        <v-btn
-                          color="primary"
-                          text
-                          @click="deletionCatDialog = false;"
-                        >Cancelar</v-btn>
+                        <v-btn color="primary" text @click="deletionCatDialog = false;">Cancelar</v-btn>
                       </v-card-actions>
                     </v-card>
                   </v-dialog>
+                  <create-category v-on:created="refresh" toUpdate :category="selected" />
                 </v-col>
               </v-row>
             </v-expansion-panel-content>
@@ -222,10 +219,11 @@ export default Vue.extend({
         .then(() => (this.deletionItem = {}))
         .then(() => (this.deletionDialog = false));
     },
-    deleteCategory(){
-      connect.delete(`/categories/${this.selected.pk}/`)
-      .then(this.refresh)
-      .then(() => this.$router.push('/management/'))
+    deleteCategory() {
+      connect
+        .delete(`/categories/${this.selected.pk}/`)
+        .then(this.refresh)
+        .then(() => this.$router.push("/management/"));
     }
   },
   components: {

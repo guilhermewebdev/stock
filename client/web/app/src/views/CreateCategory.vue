@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialog" persistent max-width="600px">
     <template v-slot:activator="{ on }">
-      <v-btn v-if="toUpdate" v-on="on">Editar</v-btn>
+      <v-btn v-if="toUpdate" text v-on="on">Editar</v-btn>
       <v-btn v-else icon v-on="on">
         <v-icon>mdi-plus</v-icon>
       </v-btn>
@@ -92,17 +92,32 @@ export default Vue.extend({
       required: v => !!v || "Este campo é obrigatório"
     }
   }),
+  watch: {
+    dialog() {
+      this.toUpdate &&
+        (() => {
+          this.form = {
+            name: this.category.name,
+            reference: this.category.reference,
+            minimum: this.category.minimum
+          };
+        })();
+    }
+  },
   methods: {
     async reset() {
       this.$refs.form.reset();
     },
     async submit() {
       if (this.$refs.form.validate()) {
-        connect
-          .post("/categories/", this.form)
+        connect[this.toUpdate ? "put" : "post"](
+          `/categories/${this.toUpdate && this.category.pk + "/"}`,
+          this.form
+        )
           .then(response => {
             this.$refs.form.reset();
             this.$emit("created", response.data);
+            if(this.toUpdate) this.dialog = false
           })
           .catch(response => {
             for (let index in response.data) {

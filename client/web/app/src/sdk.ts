@@ -51,23 +51,18 @@ interface CRUD extends Hierarchy, Reactive {
 }
 
 async function request(method:Method, url:string, data?:any):Promise<any>{
-    return new Promise((accept, reject) => {
-        connect(url, {
+    return connect(url, {
             method:method,
             data:data,
         })
-            .then(response => accept(response.data))
-            .catch(reject)
-    })
+            .then(response => response.data)
 }
 
 const reaction:Reactive = {
     observers: [],
     async notifyObservers(){
-        iterate(this.observers, (observer:Function) => {
-            if(observer) observer(this)
-        })
-        if('father' in this) this.father.notifyObservers()
+        this.observers.forEach((observer: Function) => !!observer && observer(this))
+        if(this.father) this.father.notifyObservers()
     },
     async addObserver(observer:Function){
         this.observers.push(observer)
@@ -143,6 +138,7 @@ const crud:CRUD = {
                 this.item = data
                 this.selected = this.item[this.key];
                 this.notifyObservers()
+                return data;
             })
     },
     async getItem(item:number){
@@ -160,15 +156,17 @@ const crud:CRUD = {
     async createItem(data:any){
         return request('POST', this.getURL('/?format=json'), data)
             .then((data:any) => {
-                this.list.push(data)
+                this.list ? this.list.push(data) : (this.list = [data])
                 this.notifyObservers()
+                return data;
             });
     },
     async deleteItem(item:number){
         return request('DELETE', this.getURLItem(item, '/?format=json'))
             .then(re => {
-                this.loadList()
-                this.notifyObservers()
+                this.loadList();
+                this.notifyObservers();
+                return re;
             })
     },
     async updateItem(item:number, data:any){
@@ -176,6 +174,7 @@ const crud:CRUD = {
             .then(re => {
                 this.loadList()
                 this.notifyObservers()
+                return re;
             })
     },
     async partialUpdateItem(item:number, data:any){
@@ -183,6 +182,7 @@ const crud:CRUD = {
             .then(re => {
                 this.loadList()
                 this.notifyObservers()
+                return re;
             })
         
     },

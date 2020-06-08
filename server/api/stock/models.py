@@ -75,7 +75,7 @@ class Product(models.Model):
     )
 
     def __str__(self):
-        return '%s: %s' % (self.name, self.amount)
+        return f'{self.category} - {self.brand}: {self.amount}'
 
 ##################################################################
 #############               Additions            #################
