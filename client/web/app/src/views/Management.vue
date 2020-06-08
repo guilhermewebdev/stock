@@ -100,7 +100,7 @@
               { text: 'Quantidade', value: 'amount', align: 'center' },
               { text: 'Data do cadastro', value: 'registration', align: 'center' },
               { text: 'Código', value: 'bar_code' },
-              { text: 'Ações', value: 'actions', sortable: false }
+              { text: 'Ações', value: 'actions', sortable: false, align: 'center' }
             ]"
             :items="selected.products.map((item) => {
             return {
@@ -132,6 +132,9 @@
               </v-container>
             </template>
             <template v-slot:item.actions="{ item }">
+              <v-btn :key="item.pk" color="primary" icon>
+                <v-icon small @click="dialogRemoval(item)">mdi-minus-box</v-icon>
+              </v-btn>
               <create-product :key="item.pk" toUpdate @created="refresh" :product="item" />
               <v-btn :key="item.pk" color="primary" icon>
                 <v-icon small @click="dialogDelete(item)">mdi-delete</v-icon>
@@ -151,6 +154,34 @@
                 text
                 @click="deletionDialog = false; deletionItem = {};"
               >Cancelar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <v-dialog v-model="removalDialog" persistent max-width="290">
+          <v-card>
+            <v-card-title class="headline">Remover do Estoque</v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-text-field
+                  class="col-12"
+                  label="Quantidade"
+                  :min="1"
+                  :max="removalItem.amount"
+                  type="number"
+                  v-model="amoutRemoval"
+                  persistent-hint
+                  :rules="[
+                    v => v <= removalItem.amount || `Existem apenas ${removalItem.amount} itens no estoque`,
+                    v => v > 0 || 'Informe uma quantidade válida'
+                  ]"
+                  hint="Informe a quantidade de itens a serem removidos do estoque"
+                />
+              </v-row>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="primary" text @click="removeProduct">Remover</v-btn>
+              <v-btn color="primary" text @click="removalDialog = false; removalItem = {};">Cancelar</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -187,7 +218,10 @@ export default Vue.extend({
     deletionCatDialog: false,
     editDialog: false,
     editionItem: {},
-    deletionItem: {}
+    deletionItem: {},
+    removalItem: {},
+    removalDialog: false,
+    amoutRemoval: 1
   }),
   beforeMount() {
     this.refresh();
@@ -200,30 +234,44 @@ export default Vue.extend({
     }
   },
   methods: {
-    refresh() {
+    async refresh() {
       connect.get("/categories/?format=json").then(({ data }) => {
         this.categories = data;
       });
     },
-    resize() {
+    async resize() {
       this.height = window.innerHeight - 60;
     },
-    dialogDelete(item) {
+    async dialogDelete(item) {
       this.deletionItem = item;
       this.deletionDialog = true;
     },
-    deleteProduct() {
+    async deleteProduct() {
       connect
         .delete(`/products/${this.deletionItem.pk}/`)
         .then(this.refresh)
         .then(() => (this.deletionItem = {}))
         .then(() => (this.deletionDialog = false));
     },
-    deleteCategory() {
+    async deleteCategory() {
       connect
         .delete(`/categories/${this.selected.pk}/`)
         .then(this.refresh)
         .then(() => this.$router.push("/management/"));
+    },
+    async dialogRemoval(item) {
+      this.removalDialog = true;
+      this.removalItem = item;
+    },
+    async removeProduct() {
+      connect.post(`/removals/?format=json`, {
+        product: this.removalItem.pk,
+        amount: this.amoutRemoval
+      }).then(() => {
+        this.refresh();
+        this.removalDialog = false;
+        this.removalItem = {};
+      });
     }
   },
   components: {
