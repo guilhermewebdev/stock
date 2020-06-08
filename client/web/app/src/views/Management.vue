@@ -102,6 +102,7 @@
               { text: 'Código', value: 'bar_code' },
               { text: 'Ações', value: 'actions', sortable: false, align: 'center' }
             ]"
+            :fixed-header="true"
             :items="selected.products.map((item) => {
             return {
               ...item,

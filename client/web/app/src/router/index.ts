@@ -30,6 +30,11 @@ const routes = [
     component: () => import("@/views/Management.vue"),
   },
   {
+    path: '/management/requests',
+    name: 'requests',
+    component: () => import("@/views/Requests.vue"),
+  },
+  {
     path: "/management/cat/:cat/",
     name: "category",
     component: () => import("@/views/Management.vue"),

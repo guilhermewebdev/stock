@@ -42,6 +42,12 @@
               <v-icon>mdi-stocking</v-icon>
             </v-list-item-icon>
           </v-list-item>
+          <v-list-item link to="/management/requests">
+            <v-list-item-title>Requisicões</v-list-item-title>
+            <v-list-item-icon>
+              <v-icon>mdi-minus-box</v-icon>
+            </v-list-item-icon>
+          </v-list-item>
         </v-list-group>
         <v-list-item link to="/settings">
           <v-list-item-icon>
