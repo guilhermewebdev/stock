@@ -191,7 +191,7 @@ const crud:CRUD = {
 const app:CRUD|any = {
     ...crud,
     haveItems: false,
-    url: 'http://localhost/api',
+    url: '',
     async mount(){
         const auth = await this.sessions.checkAuth()
         this.notifyObservers()
