@@ -228,15 +228,44 @@ class RemovalSerializer(serializers.ModelSerializer):
             'registration',
         ]
 
+class DeliveryProductSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = models.DeliveryProduct
+        fields = (
+            'product',
+            'amount',
+            'removal',
+            'delivery',
+            'product_request',
+        )
+        read_only_fields = (
+            'removal',
+        )
+
 class DeliverySerializer(serializers.ModelSerializer):
+    product_deliveries = DeliveryProductSerializer(
+        many=True,
+    )
+
+    def create(self, validated_data):
+        product_deliveries = validated_data.pop('product_deliveries')
+        deliveries = []
+        created = super(DeliverySerializer, self).create({
+            **validated_data,
+            'user': self.context['request'].user
+        })
+        for delivery in product_deliveries:
+            deliveries.append(models.DeliveryProduct(**delivery, delivery=created))
+        models.DeliveryProduct.objects.bulk_create(deliveries)
 
     class Meta:
         model = models.Delivery
         fields = [
             'pk',
             'request',
-            'product',
             'registration',
+            'product_deliveries',
             'amount',
             'user',
         ]
@@ -244,4 +273,5 @@ class DeliverySerializer(serializers.ModelSerializer):
             'pk',
             'user',
             'registration',
+            'amount',
         ]

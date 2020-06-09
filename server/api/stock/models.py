@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext as _
 from django.contrib.auth.admin import User
 from django.core.exceptions import ValidationError
+import asyncio
 
 
 def validator_amount(value):
@@ -179,6 +180,16 @@ class Purchase(models.Model):
 #############               Removals            ##################
 ##################################################################
 
+class RemovalManager(models.Manager):
+
+    def delete(self, *args, **kwargs):
+        async def update():
+            for removal in self.all().iterator():
+                removal.delete()
+        asyncio.run(update())
+        super(RemovalManager, self).delete(*args, **kwargs)
+
+
 class Removal(models.Model):
     objects = models.Manager()
     product = models.ForeignKey(
@@ -206,18 +217,23 @@ class Removal(models.Model):
         return '-%s %s' % (self.amount, self.product)
 
     def save(self, *args, **kwargs):
-        if self.amount > self.product.amount:
-            raise ValidationError(
-                _('Há apenas %(products)s no estoque, mas a requisição exige %(value)s'),
-                params={
-                    'products': self.product.amount,
-                    'value': self.amount,
-                }
-            )
-        self.product.amount -= self.amount
-        self.product.save(update_fields=['amount'])
+        if not self.id:
+            if self.amount > self.product.amount:
+                raise ValidationError(
+                    _('Há apenas %(products)s no estoque, mas a requisição exige %(value)s'),
+                    params={
+                        'products': self.product.amount,
+                        'value': self.amount,
+                    }
+                )
+            self.product.amount -= self.amount
+            self.product.save(update_fields=['amount'])
+        else:
+            old = Removal.objects.get(pk=self.pk)
+            diff = self.amount - old.amount
+            self.product.amount -= diff
+            self.product.save(update_fields=['amount'])
         return super(Removal, self).save(*args, **kwargs)
-
 
 
 class ConsumptionRequest(models.Model):
@@ -254,6 +270,10 @@ class ConsumptionRequest(models.Model):
         blank=True,
     )
 
+    def __str__(self):
+        consumer = dict(self.TYPES).get(self.consumer, '')
+        return f'{consumer} {self.consumer}'
+
 
 class ProductComsuptionRequest(models.Model):
     objects = models.Manager()
@@ -281,15 +301,11 @@ class ProductComsuptionRequest(models.Model):
         )
 
 
+#  Resolver a questão das entregas
 class Delivery(models.Model):
     objects = models.Manager()
-    request = models.OneToOneField(
+    request = models.ForeignKey(
         ConsumptionRequest,
-        on_delete=models.DO_NOTHING,
-        related_name='delivery'
-    )
-    product = models.ForeignKey(
-        Product,
         on_delete=models.DO_NOTHING,
         related_name='deliveries'
     )
@@ -297,17 +313,17 @@ class Delivery(models.Model):
         verbose_name=_('Data da entrega'),
         auto_now=True,
     )
-    amount = models.IntegerField(
-        verbose_name=_('Retiradas'),
-        validators=[
-            validator_amount
-        ]
-    )
     user = models.ForeignKey(
         User,
         on_delete=models.DO_NOTHING,
         related_name='deliveries',
     )
+
+    @property
+    def amount():
+        return self.product_deliveries.all().aggregate(
+            models.Sum('amount')
+        )['amount__sum']
 
     def __str__(self):
         return '%s: %s %s' % (
@@ -316,14 +332,62 @@ class Delivery(models.Model):
             self.product
         )
 
-    def remove(self):
-        removal = Removal(
+    def save(self, *args, **kwargs):
+        return super(Delivery, self).save(*args, **kwargs)
+
+
+class DeliveryProduct(models.Model):
+    objects = models.Manager()
+    product_request = models.ForeignKey(
+        ProductComsuptionRequest,
+        on_delete=models.CASCADE,
+        related_name='deliveries',
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.DO_NOTHING,
+        related_name='requests'
+    )
+    amount = models.IntegerField(
+        verbose_name=_('Quantidade'),
+        validators=[
+            validator_amount
+        ]
+    )
+    removal = models.ForeignKey(
+        Removal,
+        on_delete=models.CASCADE,
+        related_name='deliveries'
+    )
+    delivery = models.ForeignKey(
+        Delivery,
+        on_delete=models.CASCADE,
+        related_name='product_deliveries'
+    )
+
+    def __remove(self):
+        self.removal = Removal(
             product=self.product,
             amount=self.amount,
-            user=self.user,
+            user=self.delivery.user,
         )
-        removal.save()
+        self.removal.save()
+
+    def __str__(self):
+        return '%s: %s' % (
+            self.product,
+            self.amount
+        )
+
+    def __update_removal(self):
+        self.removal.product = self.product
+        self.removal.amount = self.amount
+        self.removal.user = self.delivery.user
+        self.removal.save(update_fields=['product', 'amount', 'user'])
 
     def save(self, *args, **kwargs):
-        self.remove()
-        return super(Delivery, self).save(*args, **kwargs)
+        if not self.id:
+            self.__remove()
+        else:
+            self.__update_removal()
+        return super(DeliveryProduct, self).save(*args, **kwargs)
