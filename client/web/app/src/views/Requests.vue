@@ -42,8 +42,8 @@
         </v-toolbar>
       </template>
       <template v-slot:default="props">
-        <v-row>
-          <v-col v-for="item in props.items" :key="item.name" cols="12" sm="6" md="5" lg="4">
+        <v-row dense>
+          <v-col v-for="item in props.items" :key="item.pk" cols="12" sm="6" md="5" lg="4">
             <v-card outlined tile>
               <v-card-title
                 class="subheading font-weight-bold"
@@ -66,6 +66,31 @@
                   <v-list-item-content class="align-end">Disponível: {{ product.product.amount }}</v-list-item-content>
                 </v-list-item>
               </v-list>
+              <v-card-actions class="align-end">
+                <v-btn color="primary">Entregar</v-btn>
+                <v-spacer />
+                <v-dialog v-model="deleteDialog" persistent max-width="290">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn icon v-bind="attrs" v-on="on" @click="selected = item">
+                      <v-icon>mdi-delete</v-icon>
+                    </v-btn>
+                  </template>
+                  <v-card>
+                    <v-card-title class="headline">Recusar Requisição</v-card-title>
+                    <v-card-text>Tem certeza que deseja recusar a requisição?</v-card-text>
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn color="primary" text @click="deleteDialog = false">Cancelar</v-btn>
+                      <v-btn
+                        color="primary"
+                        text
+                        :key="item.pk"
+                        @click="recuse(item.pk); deleteDialog = false;"
+                      >Recusar</v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
+              </v-card-actions>
             </v-card>
           </v-col>
         </v-row>
@@ -83,8 +108,10 @@ export default Vue.extend({
     itemsPerPageArray: [4, 8, 12],
     search: "",
     filter: {},
+    selected: {},
     sortDesc: false,
     page: 1,
+    deleteDialog: false,
     itemsPerPage: 4,
     sortBy: "consumer",
     keys: [
@@ -101,12 +128,7 @@ export default Vue.extend({
     }
   }),
   computed: {
-    numberOfPages() {
-      return Math.ceil(this.items.length / this.itemsPerPage);
-    },
-    filteredKeys() {
-      return this.keys;
-    }
+    numberOfPages: () => Math.ceil(this.items.length / this.itemsPerPage)
   },
   beforeMount() {
     this.refresh();
@@ -114,7 +136,7 @@ export default Vue.extend({
   methods: {
     async refresh() {
       connect
-        .get("requests/consum/?format=json")
+        .get("/requests/consum/?format=json")
         .then(({ data }) => (this.requests = data));
     },
     nextPage() {
@@ -125,6 +147,11 @@ export default Vue.extend({
     },
     updateItemsPerPage(number) {
       this.itemsPerPage = number;
+    },
+    async recuse(pk: number) {
+      connect
+        .delete(`/requests/consum/${this.selected.pk}/`)
+        .then(this.refresh);
     }
   }
 });
