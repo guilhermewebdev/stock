@@ -7,7 +7,7 @@
       :search="search"
       :sort-by="sortBy"
       :sort-desc="sortDesc"
-      class="elevation-4 px-3"
+      class="elevation-0 px-3"
     >
       <template v-slot:header>
         <v-toolbar color="light" elevation="0" class="mb-1">
@@ -58,13 +58,12 @@
               </v-card-subtitle>
               <v-divider></v-divider>
               <v-card-text v-if="item.note">Observações: {{ item.note }}</v-card-text>
-              <v-list dense>
-                <v-list-item v-for="(key) in filteredKeys" :key="key.value">
-                  <v-list-item-content :class="{ 'blue--text': sortBy === key }">{{ key.text }}:</v-list-item-content>
+              <v-list>
+                <v-list-item link v-for="(product) in item.products" :key="product.pk">
                   <v-list-item-content
-                    class="align-end"
                     :class="{ 'blue--text': sortBy === key }"
-                  >{{ key.format ? key.format(item[key.value]) : item[key.value] }}</v-list-item-content>
+                  >{{ product.product.name }}: {{ product.amount }}</v-list-item-content>
+                  <v-list-item-content class="align-end">Disponível: {{ product.product.amount }}</v-list-item-content>
                 </v-list-item>
               </v-list>
             </v-card>
@@ -88,7 +87,11 @@ export default Vue.extend({
     page: 1,
     itemsPerPage: 4,
     sortBy: "consumer",
-    keys: [{ text: "Produtos", value: "products" }],
+    keys: [
+      { text: "Tipo de consumidor", value: "consumer_type" },
+      { text: "Consumidor", value: "consumer" },
+      { text: "Data da requisição", value: "registration" }
+    ],
     consumers: {
       user: "Usuário",
       dentist: "Dentista",
