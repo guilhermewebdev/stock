@@ -47,7 +47,7 @@
             <v-card outlined tile>
               <v-card-title
                 class="subheading font-weight-bold"
-              >{{ item.consumer_type }} {{ item.consumer }}</v-card-title>
+              >{{ consumers[item.consumer_type] }} {{ item.consumer }}</v-card-title>
               <v-card-subtitle>
                 {{ new Date(item.registration).toLocaleString("pt-BR", {
                 weekday: "long",
@@ -57,7 +57,7 @@
                 }) }}
               </v-card-subtitle>
               <v-divider></v-divider>
-                <v-card-text v-if="item.note">Observações: {{ item.note }}</v-card-text>
+              <v-card-text v-if="item.note">Observações: {{ item.note }}</v-card-text>
               <v-list dense>
                 <v-list-item v-for="(key) in filteredKeys" :key="key.value">
                   <v-list-item-content :class="{ 'blue--text': sortBy === key }">{{ key.text }}:</v-list-item-content>
@@ -88,9 +88,14 @@ export default Vue.extend({
     page: 1,
     itemsPerPage: 4,
     sortBy: "consumer",
-    keys: [
-      { text: "Produtos", value: "products" }
-    ]
+    keys: [{ text: "Produtos", value: "products" }],
+    consumers: {
+      user: "Usuário",
+      dentist: "Dentista",
+      chamber: "Consultório",
+      patient: "Paciente",
+      other: "Outro"
+    }
   }),
   computed: {
     numberOfPages() {
