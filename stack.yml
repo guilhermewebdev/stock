@@ -1,19 +1,6 @@
 version: "3.7"
 
 services:
-    client:
-        build: 
-            context: ./client/web/app/
-            dockerfile: Dockerfile.dev
-        restart: always
-        volumes: 
-            - ./client/web/app:/app
-        command: npm run serve
-        networks: 
-            backend:
-                ipv4_address: 172.35.10.30
-        depends_on: 
-            - api
     api:
         build: 
             context: ./server/api/
@@ -25,8 +12,9 @@ services:
         environment: 
             DB_NAME: clinica
             DB_USER: centroavancado
-            DB_HOST: '172.25.20.15'
             DB_PASSWORD: abda143501.com
+            DB_HOST: '172.25.20.15'
+            DEBUG: 0
         networks: 
             db:
                 ipv4_address: 172.25.20.10
@@ -48,16 +36,15 @@ services:
                 ipv4_address: 172.25.20.15
 
     proxy:
-        image: nginx
+        build: .
         restart: always
         volumes: 
-            - ./server/proxy/nginx/conf.d:/etc/nginx/conf.d
-            # - ./server/proxy/nginx/nginx.conf:/etc/nginx/nginx.conf
-            - ./server/proxy/nginx/logs:/etc/nginx/logs
+            - ./server/proxy/nginx/logs:/etc/nginx/logs:r
         ports:
             - 80:80
             - 443:443
-        command: [nginx-debug, '-g', 'daemon off;']
+        command: [nginx, '-g', 'daemon off;']
+        stdin_open: true
         environment:
             NGINX_PORT: 80      
         networks: 

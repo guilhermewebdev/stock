@@ -183,7 +183,6 @@ export default {
     },
     async submit() {
       if (this.$refs.form.validate()) {
-        console.log(this.form);
         app.requests.consum
           .createItem(this.form)
           .then(() => {
@@ -197,13 +196,11 @@ export default {
       }
     },
     async addProduct(product: number) {
-      console.log(this.request.products);
       if (product === this.request.products.length - 1) {
         this.request.products.push({
           product: null,
           amount: 1
         });
-        console.log(this.request.products);
       }
     },
     async removeVoidProduct(index: number) {
