@@ -3,8 +3,8 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'docker-compose -f stack.yaml build; \
-                docker-compose -f stack.yaml push'
+                sh 'docker-compose -f stack.yml build; \
+                docker-compose -f stack.yml push'
             }
         }
         stage('Test') {
@@ -18,7 +18,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh 'docker swarm init; \
-                docker stack deploy --compose-file stack.yaml stock'
+                docker stack deploy --compose-file stack.yml stock'
             }
         }
     }
