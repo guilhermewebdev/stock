@@ -2,6 +2,7 @@ version: "3.7"
 
 services:
     api:
+        image: 127.0.0.1:5000/stock-api
         build: 
             context: ./server/api/
             dockerfile: Dockerfile
@@ -36,6 +37,7 @@ services:
                 ipv4_address: 172.25.20.15
 
     proxy:
+        image: 127.0.0.1:5000/stock-proxy
         build: .
         restart: always
         volumes: 
