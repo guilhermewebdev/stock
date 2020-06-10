@@ -23,7 +23,7 @@
             <v-spacer></v-spacer>
             <v-select
               v-model="sortBy"
-              solo-inverted
+              solo
               hide-details
               :items="keys"
               prepend-inner-icon="mdi-sort"
@@ -67,7 +67,50 @@
                 </v-list-item>
               </v-list>
               <v-card-actions class="align-end">
-                <v-btn color="primary">Entregar</v-btn>
+                <v-dialog v-model="deliveryDialog" persistent max-width="600px">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      color="primary"
+                      v-bind="attrs"
+                      @click="selected = item"
+                      v-on="on"
+                    >Entregar</v-btn>
+                  </template>
+                  <v-card>
+                    <v-card-title>
+                      <span class="headline">Entregar requisição</span>
+                    </v-card-title>
+                    <v-card-text>
+                      <v-container>
+                        <v-row v-for="(product) in item.products" :key="product.pk">
+                          <v-col
+                            cols="3"
+                            sm="3"
+                          >{{ product.amount }}x {{ product.product.name }}</v-col>
+                          <v-col cols="6" sm="6">
+                            <v-autocomplete
+                              :items="product.product.products.map(item => ({
+                                value: item.pk,
+                                text: `${item.brand}: ${item.bar_code}`,
+                                disabled: item.amount === 0,
+                              }))"
+                              label="Produto"
+                            ></v-autocomplete>
+                          </v-col>
+                          <v-col cols="3">
+                            <v-text-field :value="product.amount" type="number" label="Quantidade" />
+                          </v-col>
+                        </v-row>
+                      </v-container>
+                      <small>*indicates required field</small>
+                    </v-card-text>
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn color="primary" text @click="deliveryDialog = false">Fechar</v-btn>
+                      <v-btn color="primary" text @click="deliveryDialog = false">Entregar</v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
                 <v-spacer />
                 <v-dialog v-model="deleteDialog" persistent max-width="290">
                   <template v-slot:activator="{ on, attrs }">
@@ -85,7 +128,7 @@
                         color="primary"
                         text
                         :key="item.pk"
-                        @click="recuse(item.pk); deleteDialog = false;"
+                        @click="recuse(); deleteDialog = false; selected = {};"
                       >Recusar</v-btn>
                     </v-card-actions>
                   </v-card>
@@ -111,6 +154,7 @@ export default Vue.extend({
     selected: {},
     sortDesc: false,
     page: 1,
+    deliveryDialog: false,
     deleteDialog: false,
     itemsPerPage: 4,
     sortBy: "consumer",
@@ -148,7 +192,7 @@ export default Vue.extend({
     updateItemsPerPage(number) {
       this.itemsPerPage = number;
     },
-    async recuse(pk: number) {
+    async recuse() {
       connect
         .delete(`/requests/consum/${this.selected.pk}/`)
         .then(this.refresh);
