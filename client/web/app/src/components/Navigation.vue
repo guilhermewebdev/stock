@@ -36,7 +36,7 @@
           <template v-slot:activator>
             <v-list-item-title>Gerenciar</v-list-item-title>
           </template>
-          <v-list-item link to="/management">
+          <v-list-item link to="/management/stock">
             <v-list-item-title>Estoque</v-list-item-title>
             <v-list-item-icon>
               <v-icon>mdi-stocking</v-icon>
