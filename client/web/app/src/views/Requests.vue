@@ -67,7 +67,10 @@
                 </v-list-item>
               </v-list>
               <v-card-actions class="align-end">
-                <v-btn color="primary" @click="selected = item; deliveryDialog = true;">Entregar</v-btn>
+                <v-btn
+                  color="primary"
+                  @click.stop="selected = item; deliveryDialog = true;"
+                >Entregar</v-btn>
                 <v-spacer />
                 <v-dialog v-model="deleteDialog" persistent max-width="290">
                   <template v-slot:activator="{ on, attrs }">
@@ -111,15 +114,32 @@
                                 text: `${item.brand} - ${item.bar_code}`,
                                 disabled: item.amount === 0,
                               }))"
-                  :label="`${ product.amount }× ${ product.product.name }`"
+                  :label="`${ product.amount }× ${ product.product.name } *`"
+                  :rules="[
+                    v => !!v || 'Este campo é obrigatório',
+                  ]"
+                  v-model="product.request_product"
                 ></v-autocomplete>
               </v-col>
               <v-col cols="4">
-                <v-text-field min="0" :value="product.amount" type="number" label="Quantidade" />
+                <v-text-field
+                  min="0"
+                  :max="product.request_product"
+                  :rules="[
+                  v => v >= 0 || 'Informe uma quantidade válida',
+                  v => v <= product.request_product || `Existem apenas ${product.product.products.filter(item => item.pk === product.request_product)[0].amount} items no estoque`,
+                  v => !!v || 'Este campo é obrigatório',
+                ]"
+                  :value="product.amount"
+                  type="number"
+                  label="Quantidade *"
+                  v-model="product.request_amount"
+                />
               </v-col>
             </v-row>
           </v-container>
           <small>* Campos obrigatórios</small>
+          {{product_deliveries}}
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -146,26 +166,27 @@ export default Vue.extend({
     deliveryDialog: false,
     deleteDialog: false,
     product_deliveries: [],
+    amount_deliveries: [],
     itemsPerPage: 4,
     sortBy: "consumer",
     keys: [
       { text: "Tipo de consumidor", value: "consumer_type" },
       { text: "Consumidor", value: "consumer" },
-      { text: "Data da requisição", value: "registration" }
+      { text: "Data da requisição", value: "registration" },
     ],
     consumers: {
       user: "Usuário",
       dentist: "Dentista",
       chamber: "Consultório",
       patient: "Paciente",
-      other: "Outro"
-    }
+      other: "Outro",
+    },
   }),
   computed: {
     numberOfPages: () => Math.ceil(this.items.length / this.itemsPerPage),
     form: () => ({
-      request: this.$data.selected.pk
-    })
+      request: this.$data.selected.pk,
+    }),
   },
   beforeMount() {
     this.refresh();
@@ -192,7 +213,7 @@ export default Vue.extend({
     },
     async delivery() {
       connect.post("/deliveries/");
-    }
-  }
+    },
+  },
 });
 </script>
