@@ -2,16 +2,11 @@ version: "3.7"
 
 services:
     client:
-        build: 
-            context: ./client/web/app/
-            dockerfile: Dockerfile.dev
+        build: ./client/web/app/
         restart: always
         volumes: 
-            - ./client/web/app:/app
-        command: npm run serve
-        networks: 
-            backend:
-                ipv4_address: 172.35.10.30
+            - ./client/web/app:/app:z
+        command: yarn serve
         depends_on: 
             - api
     api:
@@ -20,17 +15,14 @@ services:
             dockerfile: Dockerfile
         restart: always
         volumes:
-            - ./server/api:/code
+            - ./server/api:/code:z
         command: bash main.sh
         environment: 
             DB_NAME: clinica
             DB_USER: centroavancado
             DB_PASSWORD: abda143501.com
-        networks: 
-            db:
-                ipv4_address: 172.25.20.10
-            backend:
-                ipv4_address: 172.35.10.10
+            DB_HOST: db
+            SECRET_KEY: x*3y-^8_iiud0&9cx+#%t4)!+)w$rwn%_x@9m)dq9@8988(u0n
         depends_on: 
             - db
             - proxy
@@ -42,37 +34,19 @@ services:
             POSTGRES_DB: clinica
             POSTGRES_USER: centroavancado
             POSTGRES_PASSWORD: abda143501.com
-        networks:
-            db:
-                ipv4_address: 172.25.20.15
 
     proxy:
         image: nginx
         restart: always
         volumes: 
-            - ./server/proxy/nginx/conf.d:/etc/nginx/conf.d
-            # - ./server/proxy/nginx/nginx.conf:/etc/nginx/nginx.conf
-            - ./server/proxy/nginx/logs:/etc/nginx/logs
+            - ./server/proxy/nginx/conf.d:/etc/nginx/conf.d:z
+            - ./server/proxy/nginx/logs:/etc/nginx/logs:z
         ports:
             - 80:80
             - 443:443
         command: [nginx-debug, '-g', 'daemon off;']
         environment:
-            NGINX_PORT: 80      
-        networks: 
-            - backend
-        ports: 
-            - 80:80
-            - 443:443
+            NGINX_PORT: 80
+            API_HOST: api:5804
+            CLIENT_HOST: client:8080
 
-networks: 
-    backend:
-        driver: bridge
-        ipam:
-            config: 
-                - subnet: 172.35.10.1/16
-    db:
-        driver: bridge
-        ipam:
-            config: 
-                - subnet: 172.25.20.1/16
