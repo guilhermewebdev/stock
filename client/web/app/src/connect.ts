@@ -8,7 +8,7 @@ const connect:AxiosInstance = Axios.create({
     },
     xsrfHeaderName: 'X-CSRFToken',
     xsrfCookieName: 'csrftoken',
-    baseURL: '/api/'
+    baseURL: process.env.VUE_APP_ROOT_API
 })
 
 export default connect;
