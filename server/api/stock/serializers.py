@@ -131,6 +131,11 @@ class ComsumRequestSerializer(serializers.ModelSerializer):
         label=_('Produto')
     )
 
+    def __init__(self, get, *args, **kwargs):
+        super(ComsumRequestSerializer, self).__init__(get, *args, **kwargs)
+        if(get):
+            self.fields['product'] = CategoryListSerializer()
+
     class Meta:
         model = models.ProductComsuptionRequest
         fields = [
@@ -156,12 +161,16 @@ class RequestSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
         read_only=True,
     )
-    products = ComsumRequestSerializer(
-        many=True,
-        label=_('Produtos'),
-        required=True,
-    )
-    
+
+    def __init__(self, *args, **kwargs):
+        super(RequestSerializer, self).__init__(*args, **kwargs)
+        self.fields['products'] = ComsumRequestSerializer(
+            many=True,
+            label=_('Produtos'),
+            required=True,
+            get=(self.context['request'].method == 'GET') if 'request' in self.context else False
+        )
+
 
     def create(self, validated_data):
         user = self.context['request'].user
@@ -219,15 +228,44 @@ class RemovalSerializer(serializers.ModelSerializer):
             'registration',
         ]
 
+class DeliveryProductSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = models.DeliveryProduct
+        fields = (
+            'product',
+            'amount',
+            'removal',
+            'delivery',
+            'product_request',
+        )
+        read_only_fields = (
+            'removal',
+        )
+
 class DeliverySerializer(serializers.ModelSerializer):
+    product_deliveries = DeliveryProductSerializer(
+        many=True,
+    )
+
+    def create(self, validated_data):
+        product_deliveries = validated_data.pop('product_deliveries')
+        deliveries = []
+        created = super(DeliverySerializer, self).create({
+            **validated_data,
+            'user': self.context['request'].user
+        })
+        for delivery in product_deliveries:
+            deliveries.append(models.DeliveryProduct(**delivery, delivery=created))
+        models.DeliveryProduct.objects.bulk_create(deliveries)
 
     class Meta:
         model = models.Delivery
         fields = [
             'pk',
             'request',
-            'product',
             'registration',
+            'product_deliveries',
             'amount',
             'user',
         ]
@@ -235,4 +273,5 @@ class DeliverySerializer(serializers.ModelSerializer):
             'pk',
             'user',
             'registration',
+            'amount',
         ]

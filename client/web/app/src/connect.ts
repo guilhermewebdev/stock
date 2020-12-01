@@ -8,7 +8,7 @@ const connect:AxiosInstance = Axios.create({
     },
     xsrfHeaderName: 'X-CSRFToken',
     xsrfCookieName: 'csrftoken',
-    baseURL: 'http://localhost/api/'
+    baseURL: '/api/'
 })
 
 export default connect;
