@@ -20,6 +20,7 @@ services:
         environment: 
             DB_NAME: clinica
             DB_USER: centroavancado
+            DB_HOST: '172.25.20.15'
             DB_PASSWORD: abda143501.com
             DB_HOST: db
             DB_PORT: 5432

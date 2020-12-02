@@ -1,0 +1,68 @@
+version: "3.7"
+
+services:
+    api:
+        image: 127.0.0.1:5000/stock-api
+        build: 
+            context: ./server/api/
+            dockerfile: Dockerfile
+        restart: always
+        volumes:
+            - ./server/api:/code
+        command: bash main.sh
+        environment: 
+            DB_NAME: clinica
+            DB_USER: centroavancado
+            DB_PASSWORD: abda143501.com
+            DB_HOST: '172.25.20.15'
+            DEBUG: 0
+        networks: 
+            db:
+                ipv4_address: 172.25.20.10
+            backend:
+                ipv4_address: 172.35.10.10
+        depends_on: 
+            - db
+            - proxy
+            
+    db:
+        image: postgres
+        restart: always
+        environment: 
+            POSTGRES_DB: clinica
+            POSTGRES_USER: centroavancado
+            POSTGRES_PASSWORD: abda143501.com
+        networks:
+            db:
+                ipv4_address: 172.25.20.15
+
+    proxy:
+        image: 127.0.0.1:5000/stock-proxy
+        build: .
+        restart: always
+        volumes: 
+            - ./server/proxy/nginx/logs:/etc/nginx/logs:r
+        ports:
+            - 80:80
+            - 443:443
+        command: [nginx, '-g', 'daemon off;']
+        stdin_open: true
+        environment:
+            NGINX_PORT: 80      
+        networks: 
+            - backend
+        ports: 
+            - 80:80
+            - 443:443
+
+networks: 
+    backend:
+        driver: bridge
+        ipam:
+            config: 
+                - subnet: 172.35.10.1/16
+    db:
+        driver: bridge
+        ipam:
+            config: 
+                - subnet: 172.25.20.1/16

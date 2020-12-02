@@ -111,7 +111,7 @@ export default Vue.extend({
     async submit() {
       if (this.$refs.form.validate()) {
         connect[this.toUpdate ? "put" : "post"](
-          `/categories/${this.toUpdate && this.category.pk + "/"}`,
+          `/categories/${this.toUpdate ? this.category.pk + "/" : ''}`,
           this.form
         )
           .then(response => {
